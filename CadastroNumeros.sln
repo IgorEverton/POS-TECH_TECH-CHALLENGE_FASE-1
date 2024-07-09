@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CadastroNumeros", "CadastroNumeros\CadastroNumeros.csproj", "{806BC7D3-29FE-45CA-826E-1A5D1BDFBB96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CadastroNumeros", "CadastroNumeros\CadastroNumeros.csproj", "{806BC7D3-29FE-45CA-826E-1A5D1BDFBB96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestingProject", "TestingProject\TestingProject.csproj", "{442081DF-840D-43FD-A24F-E946CD2193CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{806BC7D3-29FE-45CA-826E-1A5D1BDFBB96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{806BC7D3-29FE-45CA-826E-1A5D1BDFBB96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{806BC7D3-29FE-45CA-826E-1A5D1BDFBB96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{442081DF-840D-43FD-A24F-E946CD2193CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{442081DF-840D-43FD-A24F-E946CD2193CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{442081DF-840D-43FD-A24F-E946CD2193CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{442081DF-840D-43FD-A24F-E946CD2193CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
