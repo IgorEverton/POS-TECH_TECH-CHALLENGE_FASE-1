@@ -25,13 +25,6 @@ namespace CadastroNumeros.Teste.Stubs
                 }
             };
 
-            var dDD = new DDD()
-            {
-                Codigo = 1,
-                Regiao = "teste",
-                Contatos = listaContato
-            };
-
             var dddsList = new List<DDD>
             {
                 new()

@@ -26,13 +26,6 @@ namespace CadastroNumeros.Teste.Models
             return new DDD();
         }
 
-        private List<DDD> CreateInvalidsDDDs(Type type)
-        {
-            return GetDDDStub(type).GetInvalidDDDs();
-        }
-
-        private DDDstub GetDDDStub(Type type) => Activator.CreateInstance(type) as DDDstub;
-
         [Fact]
         public void ToString_StateUnderTest_ExpectedBehavior()
         {
@@ -52,8 +45,8 @@ namespace CadastroNumeros.Teste.Models
         public void ToString_StateUnderTest_ErrorBehavior(Type type)
         {
             // Arrange
-            var dddList = CreateInvalidsDDDs(type);
-            var stub = GetDDDStub(type);
+            var stub = Activator.CreateInstance(type) as DDDstub;
+            var dddList = stub.GetInvalidDDDs();
 
             // Act
             foreach (var ddd in dddList)
