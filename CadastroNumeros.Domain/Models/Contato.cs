@@ -1,28 +1,27 @@
-﻿namespace CadastroNumeros.Domain.Models
+﻿using CadastroNumeros.Domain.Validation;
+using System.ComponentModel.DataAnnotations;
+
+namespace CadastroNumeros.Domain.Models;
+
+public class Contato
 {
-    public class Contato
-    {
-        
-        public int Id { get; set; }
-        public DateTime DataCriacao { get; set; }
-        public string Nome { get; set; }
-        public int Idade { get; set; }
-        public int NumeroTel { get; set; }
-        public string Endereco { get; set; }
-        public int DDD { get; set; }
-        public virtual DDD _DDD { get; set; }
+    public Guid Id { get; set; }
 
-        public Contato() { }
+    public DateTime DataCriacao { get; set; }
+    
+    [MaxLength(100)]
+    public string Nome { get; set; }
 
-        public Contato(int id, string nome, int idade, int numeroTel, string endereco, int dDD)
-        {
-            Id = id;
-            Nome = nome;
-            Idade = idade;
-            NumeroTel = numeroTel;
-            Endereco = endereco;
-            DDD = dDD;
-        }
-        
-    }
+    public int? Idade { get; set; }
+
+    [EmailAddress]
+    [MaxLength(100)]
+    public string Email { get; set; }
+
+    [MaxLength(9)]
+    public string Telefone { get; set; }
+
+    [DddValidation]
+    public int CodigoDdd { get; set; }
 }
+

@@ -20,4 +20,8 @@
     <ProjectReference Include="..\CadastroNumeros.Domain\CadastroNumeros.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

@@ -1,8 +1,8 @@
-﻿using CadastroNumeros.Domain.Interfaces.Service;
+﻿using CadastroNumeros.Infra.Interfaces.Service;
 using CadastroNumeros.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CadastroNumeros.Controllers;
+namespace CadastroNumeros.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -15,13 +15,13 @@ public class ContatoController : ControllerBase
     }
 
     [HttpGet("retornar-contatos")]
-    public async Task<IActionResult> GetAll() 
+    public async Task<IActionResult> GetAll()
     {
         return Ok(await _service.ListarContatos());
     }
 
     [HttpGet("retornar-contato/{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(Guid id)
     {
         var contatoEncontrado = await _service.RetornarContato(id);
 
@@ -29,23 +29,35 @@ public class ContatoController : ControllerBase
         {
             return Ok(contatoEncontrado);
         }
-        else 
+        else
             return NotFound();
     }
-    [HttpPost("inserir-contato")]
-    public async Task<IActionResult> PostInserirContato([FromBody] Contato contato) 
+
+    [HttpGet("retornar-contatos-por-ddd/{ddd}")]
+    public async Task<IActionResult> GetById(int ddd)
     {
-        if (contato == null) 
-        { 
+        var listaContatos = await _service.ListarContatosPorDdd(ddd);
+
+        if (listaContatos != null)
+            return Ok(listaContatos);
+        else
+            return NotFound();
+    }
+
+    [HttpPost("inserir-contato")]
+    public async Task<IActionResult> PostInserirContato([FromBody] Contato contato)
+    {
+        if (contato == null)
             return BadRequest("Contato não pode ser nulo");
-        }
+        
         try
-        {   
+        {
+            contato.Id = new Guid();
             var contatoCriado = await _service.CriarContato(contato);
-            return CreatedAtAction(nameof(GetById), new { id = contato.Id}, contato);
+            return CreatedAtAction(nameof(GetById), new { id = contatoCriado.Id }, contato);
         }
-        catch (Exception ex) 
-        {   
+        catch (Exception ex)
+        {
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
@@ -59,9 +71,9 @@ public class ContatoController : ControllerBase
         try
         {
             var contatoRecuperado = await _service.RetornarContato(contatoAtualizado.Id);
-            if(contatoRecuperado != null)
+            if (contatoRecuperado != null)
             {
-                await _service.AtualizarContato(contatoRecuperado); 
+                await _service.AtualizarContato(contatoRecuperado);
                 return Ok(contatoRecuperado);
             }
             else
@@ -75,19 +87,19 @@ public class ContatoController : ControllerBase
         }
     }
     [HttpDelete("delete-contato/{id}")]
-    public async Task<IActionResult> DeleteCadastro(int idContato)
+    public async Task<IActionResult> DeleteCadastro(Guid id)
     {
         try
         {
-            var contatoEncontrado = await _service.RetornarContato(idContato);
+            var contatoEncontrado = await _service.RetornarContato(id);
             if (contatoEncontrado == null)
             {
                 return NotFound("Contato não encontrado");
             }
-            await _service.DeletarContato(idContato);
+            await _service.DeletarContato(id);
             return NoContent();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }

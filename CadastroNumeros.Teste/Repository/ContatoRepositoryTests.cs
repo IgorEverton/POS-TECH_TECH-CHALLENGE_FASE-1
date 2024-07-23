@@ -48,7 +48,7 @@ namespace CadastroNumeros.Teste.Repository
         {
             // Arrange
             var contatoRepository = this.CreateContatoRepository();
-            int id = 0;
+            Guid id = new Guid();
 
             // Act
             var result = await contatoRepository.RetornarContato(
@@ -94,7 +94,7 @@ namespace CadastroNumeros.Teste.Repository
         {
             // Arrange
             var contatoRepository = this.CreateContatoRepository();
-            int Id = 0;
+            Guid Id = new Guid();
 
             // Act
             await contatoRepository.DeletarContato(

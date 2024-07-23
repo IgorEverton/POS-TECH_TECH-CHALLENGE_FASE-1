@@ -1,4 +1,4 @@
-﻿using CadastroNumeros.Domain.Interfaces.Repository;
+﻿using CadastroNumeros.Infra.Interfaces.Repository;
 using CadastroNumeros.Domain.Models;
 using CadastroNumeros.Infra.Data;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +22,8 @@ public class ContatoRepository : IContatoRepository
     /// </returns>
     public async Task<Contato> CriarContato(Contato contato)
     {
+        contato.DataCriacao = DateTime.Now.ToLocalTime();
+
         await _context.AddAsync(contato);
         _context.SaveChanges();
         return contato;
@@ -34,7 +36,7 @@ public class ContatoRepository : IContatoRepository
     /// <returns>Retornar um objeto do tipo usuário 
     /// com as informações cadastradas no banco
     /// /returns>
-    public async Task<Contato> RetornarContato(int id)
+    public async Task<Contato> RetornarContato(Guid id)
     {
         return await _context.Contatos.FindAsync(id);
     }
@@ -49,19 +51,21 @@ public class ContatoRepository : IContatoRepository
     }
 
     /// <summary>
+    /// Método resposável por retornar contatos cadastrados no banco de dados por ddd
+    /// </summary>
+    /// <returns>Lista de objetos do tipo Contato</returns>
+    public async Task<IEnumerable<Contato>> ListarContatosPorDdd(int ddd)
+    {
+        return await _context.Contatos.Where(x => x.CodigoDdd == ddd).ToListAsync();
+    }
+
+    /// <summary>
     /// Método responsável por atualizar as informações de um contato no banco de dados
     /// </summary>
     /// <param name="contato">Um objeto do tipo Contato</param>
     public async Task AtualizarContato(Contato contato)
     {
-        var contatoSalvo = await _context.Contatos.FindAsync(contato.Id);
-
-        contatoSalvo.DDD = contato.DDD;
-        contatoSalvo.Endereco = contato.Endereco;
-        contatoSalvo.Idade = contato.Idade;
-        contatoSalvo.Nome = contato.Nome;
-        contatoSalvo.NumeroTel = contato.NumeroTel;
-
+        _context.Contatos.Update(contato);
         _context.SaveChanges();
     }
 
@@ -69,9 +73,9 @@ public class ContatoRepository : IContatoRepository
     /// Método resposável por excluir um contato do banco de dados
     /// </summary>
     /// <param name="Id">Id do Contato</param>
-    public async Task DeletarContato(int Id)
+    public async Task DeletarContato(Guid id)
     {
-        var contatoEncontrado = await _context.Contatos.FindAsync(Id);
+        var contatoEncontrado = await _context.Contatos.FindAsync(id);
         if (contatoEncontrado != null)
         {
             _context.Remove(contatoEncontrado);

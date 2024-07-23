@@ -1,10 +1,7 @@
-﻿using CadastroNumeros.Application.Services;
-using CadastroNumeros.Domain.Interfaces.Repository;
-using CadastroNumeros.Domain.Models;
+﻿using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Infra.Interfaces.Repository;
+using CadastroNumeros.Infra.Services;
 using Moq;
-using System;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace CadastroNumeros.Teste.Services
 {
@@ -64,7 +61,7 @@ namespace CadastroNumeros.Teste.Services
         {
             // Arrange
             var service = this.CreateService();
-            int Id = 0;
+            Guid Id = new Guid();
 
             // Act
             await service.DeletarContato(
@@ -94,7 +91,7 @@ namespace CadastroNumeros.Teste.Services
         {
             // Arrange
             var service = this.CreateService();
-            int id = 0;
+            Guid id = new Guid();
 
             // Act
             var result = await service.RetornarContato(

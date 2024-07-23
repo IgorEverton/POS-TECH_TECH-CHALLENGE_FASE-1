@@ -19,11 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CadastroNumeros.Application\CadastroNumeros.Application.csproj" />
     <ProjectReference Include="..\CadastroNumeros.Domain\CadastroNumeros.Domain.csproj" />
     <ProjectReference Include="..\CadastroNumeros.Infra\CadastroNumeros.Infra.csproj" />
-    <ProjectReference Include="..\CadastroNumeros.IoC\CadastroNumeros.IoC.csproj" />
-    <ProjectReference Include="..\CadastroNumeros\CadastroNumeros.csproj" />
+    <ProjectReference Include="..\CadastroNumeros\CadastroNumeros.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
