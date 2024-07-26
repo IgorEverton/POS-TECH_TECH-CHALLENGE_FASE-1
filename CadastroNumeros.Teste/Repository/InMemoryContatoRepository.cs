@@ -1,6 +1,7 @@
 ﻿using CadastroNumeros.Domain.Models;
 using CadastroNumeros.Implementations;
 using CadastroNumeros.Infra.Data;
+using CadastroNumeros.Infra.Services;
 using CadastroNumeros.Teste.Stubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -93,17 +94,17 @@ namespace CadastroNumeros.Teste.Repository
             public async Task TestMethod2()
             {
                 // Arrange
-                var contatos = await contatoRepository.ListarContatos();
-                var contatoAntigo = contatos.First();
-                var contatoNovo = contatoAntigo;
-                contatoNovo.Nome = "novo nome";
+                var contato = new ContatoStub().Get();
+                await contatoRepository.CriarContato(contato);
+                string nomeAntigo = contato.Nome;
+                contato.Nome = "novo nome";
 
                 // Act
-                await contatoRepository.AtualizarContato(contatoNovo);
-                var result = await contatoRepository.RetornarContato(contatoNovo.Id);
+                await contatoRepository.AtualizarContato(contato);
+                var result = await contatoRepository.RetornarContato(contato.Id);
 
                 // Assert
-                Assert.NotEqual(contatoAntigo.Nome, result.Nome);
+                Assert.NotEqual(nomeAntigo, result.Nome);
             }
 
             [Fact]

@@ -99,20 +99,9 @@ namespace CadastroNumeros.Teste.Services
             public async Task TestMethod2()
             {
                 // Arrange
-                var contatoTeste = new ContatoStub().Get();
-                await contatoService.CriarContato(contatoTeste);
-                var contatos = await contatoService.ListarContatos();
-                var contatoAntigo = contatos.First();
-                var stub = new ContatoStub();
-                var contato = stub.Get();
-                contato.Email = contatoAntigo.Email;
-                contato.CodigoDdd = contatoAntigo.CodigoDdd;
-                contato.DataCriacao = contatoAntigo.DataCriacao;
-                contato.Id = contatoAntigo.Id;
-                contato.Idade = contatoAntigo.Idade;
-                contato.Nome = contatoAntigo.Nome;
-                contato.Telefone = contatoAntigo.Telefone;
-
+                var contato = new ContatoStub().Get();
+                await contatoService.CriarContato(contato);
+                string nomeAntigo = contato.Nome;
                 contato.Nome = "novo nome";
 
                 // Act
@@ -120,7 +109,7 @@ namespace CadastroNumeros.Teste.Services
                 var result = await contatoService.RetornarContato(contato.Id);
 
                 // Assert
-                Assert.NotEqual(contatoAntigo.Nome, result.Nome);
+                Assert.NotEqual(nomeAntigo, result.Nome);
             }
 
             [Fact]
