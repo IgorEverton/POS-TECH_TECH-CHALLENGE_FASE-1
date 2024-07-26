@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CadastroNumeros.Api\CadastroNumeros.Api.csproj" />
     <ProjectReference Include="..\CadastroNumeros.Domain\CadastroNumeros.Domain.csproj" />
     <ProjectReference Include="..\CadastroNumeros.Infra\CadastroNumeros.Infra.csproj" />
   </ItemGroup>
