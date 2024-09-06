@@ -27,9 +27,9 @@ public class ContatoService : IContatoService
         await _contatoRepository.DeletarContato(id);
     }
 
-    public async Task<IEnumerable<Contato>> ListarContatos()
+    public async Task<IEnumerable<Contato>> ListarContatos(int pageNumber = 1, int pageSize = 10)
     {
-        return await _contatoRepository.ListarContatos();
+        return await _contatoRepository.ListarContatos(pageNumber, pageSize);
     }
 
     public async Task<IEnumerable<Contato>> ListarContatosPorDdd(int ddd)
