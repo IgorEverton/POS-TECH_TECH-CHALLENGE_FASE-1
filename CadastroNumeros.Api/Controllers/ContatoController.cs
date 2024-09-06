@@ -15,9 +15,10 @@ public class ContatoController : ControllerBase
     }
 
     [HttpGet("retornar-contatos")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
     {
-        return Ok(await _service.ListarContatos());
+        var contatos = await _service.ListarContatos(pageNumber, pageSize);
+        return Ok(contatos);
     }
 
     [HttpGet("retornar-contato/{id}")]

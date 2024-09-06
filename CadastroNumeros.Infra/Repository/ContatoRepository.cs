@@ -45,9 +45,13 @@ public class ContatoRepository : IContatoRepository
     /// Método resposável por retornar todos os usuários cadastrados no banco de dados
     /// </summary>
     /// <returns>Lista de objetos do tipo Contato</returns>
-    public async Task<IEnumerable<Contato>> ListarContatos()
+    public async Task<IEnumerable<Contato>> ListarContatos(int pageNumber = 1, int pageSize = 10)
     {
-        return await _context.Contatos.ToListAsync();
+        return await _context.Contatos
+            .AsNoTracking()
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
     }
 
     /// <summary>
