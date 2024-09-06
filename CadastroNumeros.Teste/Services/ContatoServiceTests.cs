@@ -70,12 +70,12 @@ namespace CadastroNumeros.Teste.Services
                 new Contato { Id = Guid.NewGuid(), Nome = "Maria Silva", Idade = 35, Email = "maria.silva@example.com", Telefone = "222222222", CodigoDdd = 21 }
             };
 
-            _mockContatoRepository.Setup(repo => repo.ListarContatos())
+            _mockContatoRepository.Setup(repo => repo.ListarContatos(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(contatos);
 
-            var result = await _contatoService.ListarContatos();
+            var result = await _contatoService.ListarContatos(1, 10);
 
-            _mockContatoRepository.Verify(repo => repo.ListarContatos(), Times.Once);
+            _mockContatoRepository.Verify(repo => repo.ListarContatos(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
             Assert.Equal(contatos, result);
         }
 

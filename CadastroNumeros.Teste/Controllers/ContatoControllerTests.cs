@@ -27,7 +27,7 @@ namespace CadastroNumeros.Teste.Controllers
                 new Contato { Id = Guid.NewGuid(), Nome = "Ana Souza", Idade = 25, Email = "ana.souza@example.com", Telefone = "123456789", CodigoDdd = 31 }
             };
 
-            _mockService.Setup(s => s.ListarContatos()).ReturnsAsync(contatos);
+            _mockService.Setup(s => s.ListarContatos(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(contatos);
 
             // Act
             var result = await _controller.GetAll();

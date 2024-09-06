@@ -86,7 +86,7 @@ namespace CadastroNumeros.Teste.Repository
                 context.Contatos.AddRange(contatos);
                 context.SaveChanges();
 
-                var result = await repository.ListarContatos();
+                var result = await repository.ListarContatos(1, 10);
 
                 Assert.Equal(2, result.Count());
             }
