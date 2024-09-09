@@ -2,6 +2,7 @@ using System.Reflection;
 using CadastroNumeros.Api.Configuration;
 using CadastroNumeros.Infra.Data;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,9 +35,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
-app.UseAuthorization();
-
-app.MapControllers();
+// Add Prometheus middleware
+app.UseHttpMetrics();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    // Expose the /metrics endpoint
+    endpoints.MapMetrics();
+});
 
 app.Run();
