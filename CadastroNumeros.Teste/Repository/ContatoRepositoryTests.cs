@@ -16,7 +16,7 @@ namespace CadastroNumeros.Teste.Repository
         }
 
         [Fact]
-        [Category("Integration")]
+        [Trait("Category", "Integration")]
         public async Task CriarContato_DeveAdicionarContatoNaDatabase()
         {
             var options = CreateInMemoryOptions();
@@ -44,7 +44,7 @@ namespace CadastroNumeros.Teste.Repository
         }
 
         [Fact]
-        [Category("Integration")]
+        [Trait("Category", "Integration")]
         public async Task RetornarContato_DeveRetornarOContatoPeloId()
         {
             var options = CreateInMemoryOptions();
@@ -73,7 +73,7 @@ namespace CadastroNumeros.Teste.Repository
         }
 
         [Fact]
-        [Category("Integration")]
+        [Trait("Category", "Integration")]
         public async Task ListarContatos_DeveRetornarTodosOsContatos()
         {
             var options = CreateInMemoryOptions();
@@ -97,7 +97,7 @@ namespace CadastroNumeros.Teste.Repository
         }
 
         [Fact]
-        [Category("Integration")]
+        [Trait("Category", "Integration")]
         public async Task ListarContatosPorDdd_DeveRetornarOsContatosFiltrandoPeloDdd()
         {
             var options = CreateInMemoryOptions();
@@ -123,7 +123,7 @@ namespace CadastroNumeros.Teste.Repository
         }
 
         [Fact]
-        [Category("Integration")]
+        [Trait("Category", "Integration")]
         public async Task AtualizarContato_DeveAtualizarUmContatoNaDatabase()
         {
             var options = CreateInMemoryOptions();
@@ -153,7 +153,7 @@ namespace CadastroNumeros.Teste.Repository
         }
 
         [Fact]
-        [Category("Integration")]
+        [Trait("Category", "Integration")]
         public async Task DeletarContato_DeveRemoverUmContatoDaDatabase()
         {
             var options = CreateInMemoryOptions();
