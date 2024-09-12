@@ -1,0 +1,52 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04
+    container_name: db
+    hostname: db
+    env_file: .env
+    environment:
+    - MSSQL_SA_PASSWORD=$SQLSERVER_SA_PASSWORD
+    - MSSQL_PID=Express
+    - ACCEPT_EULA=Y
+    ports:
+    - 1439:$SQLSERVER_PORT
+    volumes:
+    - db-data:/var/opt/mssql
+    # - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    networks:
+    - app-network
+
+  app:
+    build:
+      context: .
+      dockerfile: ./.devcontainer/Dockerfile
+    container_name: app
+    hostname: app
+    env_file: .env
+    working_dir: /app
+    user: vscode
+    tty: true
+    volumes:
+    - .:/app
+    networks:
+    - app-network
+
+  grafana:
+    image: grafana/grafana:11.0.0-ubuntu
+    container_name: grafana
+    hostname: grafana
+    ports: 
+    - 3000:3000
+    environment:
+    - GF_AUTH_ANONYMOUS_ENABLED=true
+    networks:
+    - app-network
+    volumes:
+    - grafana-data:/var/lib/grafana
+
+volumes:
+  db-data:
+  grafana-data:
+
+networks:
+  app-network:
