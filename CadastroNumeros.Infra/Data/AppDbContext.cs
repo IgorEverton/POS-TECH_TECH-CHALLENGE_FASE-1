@@ -1,6 +1,5 @@
 ﻿using CadastroNumeros.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CadastroNumeros.Infra.Data;
 
@@ -12,6 +11,15 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        if (!optionsBuilder.IsConfigured)
+        {
+            // Buscar a string de conexão da variável de ambiente
+            var connectionString = Environment.GetEnvironmentVariable("SQLSERVER_CONNECTION_STRING");
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                optionsBuilder.UseSqlServer(connectionString);
+            }
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

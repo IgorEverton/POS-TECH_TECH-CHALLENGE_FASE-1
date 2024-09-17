@@ -1,0 +1,64 @@
+name: .NET Build and Test
+
+on: 
+  push:
+    branches: [ "Testes_integracao" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: "FiapC#1234"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "exit 0" 
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up .NET environment
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.x' # Defina a versão do .NET que você está usando
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: dotnet restore
+
+      # Step 4: Wait for SQL Server to be ready
+      - name: Wait for SQL Server to be ready
+        run: |
+          echo "Waiting for SQL Server to be ready..."
+          docker exec $(docker ps -q) /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'FiapC#1234' -Q "SELECT @@VERSION"
+
+      # Step 5: Run EF Core migrations to create the database schema
+      - name: Run migrations
+        run: dotnet ef database update --no-build
+        env:
+          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;" # Adapte a string de conexão ao seu contexto
+
+      # Step 6: Set up the connection string as an environment variable
+      - name: Set SQL Server connection string
+        run: echo "SQLSERVER_CONNECTION_STRING=Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;" >> $GITHUB_ENV
+
+      # Step 7: Run EF Core migrations to create the database schema
+      - name: Run migrations
+        run: dotnet ef database update --no-build
+
+      # Step 8: Run unit tests
+      - name: Run unit tests
+        run: dotnet test --no-restore --verbosity normal
+
+      
