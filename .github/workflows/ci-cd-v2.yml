@@ -38,10 +38,10 @@ jobs:
         run: dotnet restore
 
       # Step 4: Wait for SQL Server to be ready
-      - name: Wait for SQL Server to be ready
-        run: |
-          echo "Waiting for SQL Server to be ready..."
-          docker exec mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P FiapC#1234 -Q "SELECT @@VERSION"
+      #- name: Wait for SQL Server to be ready
+      #  run: |
+      #    echo "Waiting for SQL Server to be ready..."
+      #    docker exec mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P FiapC#1234 -Q "SELECT @@VERSION"
 
       # Step 5: Run EF Core migrations to create the database schema
       - name: Run migrations
