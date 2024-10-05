@@ -31,7 +31,7 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '7.x' # Defina a versão do .NET que você está usando
+          dotnet-version: '8.x' # Defina a versão do .NET que você está usando
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -53,7 +53,7 @@ jobs:
 
       # Step 7: Run EF Core migrations to create the database schema
       - name: Run migrations
-        run: dotnet ef database update --no-build --project ./CadastroNumeros.Infra/CadastroNumeros.Infra.csproj
+        run: dotnet ef database update --project ./CadastroNumeros.Infra/CadastroNumeros.Infra.csproj
         env:
           ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;" # Adapte a string de conexão ao seu contexto
 
