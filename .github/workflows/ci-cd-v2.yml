@@ -47,7 +47,7 @@ jobs:
 
       - name: Update appsettings.json
         run: |
-         sed -i 's|\"DefaultConnectionTesteIntegracao\": \"[^\"]*\"|\"DefaultConnectionTesteIntegracao\": \"Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;\"|' ./CadastroNumeros.Api/appsettings.json
+         sed -i 's|\"DefaultConnectionTesteIntegracao\": \"[^\"]*\"|\"DefaultConnectionTesteIntegracao\": \"Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;TrustServerCertificate=True;Connection Timeout=30;\"|' ./CadastroNumeros.Api/appsettings.json
 
       # Step 7: Run EF Core migrations to create the database schema
       #- name: Run migrations
