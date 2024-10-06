@@ -1,23 +1,19 @@
 ﻿using CadastroNumeros.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CadastroNumeros.Infra.Data;
-
-public class AppDbContext : DbContext
+namespace CadastroNumeros.Infra.Data
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-    public DbSet<Contato> Contatos { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public class AppDbContext : DbContext
     {
-    }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
+        public DbSet<Contato> Contatos { get; set; }
 
-        modelBuilder.Entity<Contato>();
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Contato>();
+        }
     }
 }
