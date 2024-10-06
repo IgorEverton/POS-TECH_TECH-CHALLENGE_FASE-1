@@ -24,5 +24,11 @@
     <ProjectReference Include="..\CadastroNumeros.Domain\CadastroNumeros.Domain.csproj" />
     <ProjectReference Include="..\CadastroNumeros.Infra\CadastroNumeros.Infra.csproj" />
   </ItemGroup>
+	
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>
