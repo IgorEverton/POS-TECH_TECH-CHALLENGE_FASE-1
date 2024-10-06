@@ -1,31 +1,19 @@
 ﻿using CadastroNumeros.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CadastroNumeros.Infra.Data;
-
-public class AppDbContext : DbContext
+namespace CadastroNumeros.Infra.Data
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-
-    public DbSet<Contato> Contatos { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public class AppDbContext : DbContext
     {
-        if (!optionsBuilder.IsConfigured)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+        public DbSet<Contato> Contatos { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Buscar a string de conexão da variável de ambiente
-            var connectionString = Environment.GetEnvironmentVariable("SQLSERVER_CONNECTION_STRING");
-            if (!string.IsNullOrEmpty(connectionString))
-            {
-                optionsBuilder.UseSqlServer(connectionString);
-            }
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Contato>();
         }
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        modelBuilder.Entity<Contato>();
     }
 }

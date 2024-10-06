@@ -1,6 +1,7 @@
 ﻿using CadastroNumeros.Domain.Models;
 using CadastroNumeros.Infra.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace CadastroNumeros.Tests.Integration
 {
@@ -10,12 +11,17 @@ namespace CadastroNumeros.Tests.Integration
 
         public AppDbContextIntegrationTests()
         {
-            // Obter a string de conexão da variável de ambiente
-            var connectionString = Environment.GetEnvironmentVariable("SQLSERVER_CONNECTION_STRING");
+            var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .Build();
+
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            var connectionString = configuration.GetConnectionString("DefaultConnectionTesteIntegracao");
 
             if (string.IsNullOrEmpty(connectionString))
             {
-                throw new InvalidOperationException("A variável de ambiente SQLSERVER_CONNECTION_STRING não está configurada.");
+                throw new InvalidOperationException("Não foi encontrada nenhuma DefaultConnectionTesteIntegracao");
             }
 
             // Configurando o DbContext para usar a string de conexão vinda da variável de ambiente

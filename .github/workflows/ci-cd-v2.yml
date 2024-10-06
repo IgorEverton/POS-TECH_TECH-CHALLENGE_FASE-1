@@ -37,26 +37,22 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
 
-      # Step 4: Wait for SQL Server to be ready
-      #- name: Wait for SQL Server to be ready
-      #  run: |
-      #    echo "Waiting for SQL Server to be ready..."
-      #    docker exec mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P FiapC#1234 -Q "SELECT @@VERSION"
-
       # Step 5: Run EF Core migrations to create the database schema
-      - name: Install EF Core CLI
-        run: dotnet tool install --global dotnet-ef
+      #- name: Install EF Core CLI
+      #  run: dotnet tool install --global dotnet-ef
 
       # Step 6: Set up the connection string as an environment variable
-      - name: Set SQL Server connection string
-        run: echo "SQLSERVER_CONNECTION_STRING=Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;" >> $GITHUB_ENV
+      #- name: Set SQL Server connection string
+      #  run: echo "SQLSERVER_CONNECTION_STRING=Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;" >> $GITHUB_ENV
+
+      - name: Update appsettings.json
+        run: |
+         sed -i 's|\"DefaultConnectionTesteIntegracao\": \"[^\"]*\"|\"DefaultConnectionTesteIntegracao\": \"Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;\"|' ./CadastroNumeros.Api/appsettings.json
 
       # Step 7: Run EF Core migrations to create the database schema
-      - name: Run migrations
-        run: dotnet ef database update --project ./CadastroNumeros.Infra/CadastroNumeros.Infra.csproj
-        env:
-          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;" # Adapte a string de conexão ao seu contexto
-
+      #- name: Run migrations
+      #  run: dotnet ef database update --project ./CadastroNumeros.Infra/CadastroNumeros.Infra.csproj
+        
       # Step 8: Run unit tests
       - name: Run unit tests
         run: dotnet test --no-restore --verbosity normal
