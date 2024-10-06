@@ -1,4 +1,4 @@
-name: .NET Build and Test
+name: .NET Build and Test + BD
 
 on: 
   push:
@@ -31,29 +31,18 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.x' # Defina a versão do .NET que você está usando
+          dotnet-version: '8.x'
 
       # Step 3: Install dependencies
       - name: Install dependencies
         run: dotnet restore
 
-      # Step 5: Run EF Core migrations to create the database schema
-      #- name: Install EF Core CLI
-      #  run: dotnet tool install --global dotnet-ef
-
-      # Step 6: Set up the connection string as an environment variable
-      #- name: Set SQL Server connection string
-      #  run: echo "SQLSERVER_CONNECTION_STRING=Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;" >> $GITHUB_ENV
-
+      # Step 4:
       - name: Update appsettings.json
         run: |
          sed -i 's|\"DefaultConnectionTesteIntegracao\": \"[^\"]*\"|\"DefaultConnectionTesteIntegracao\": \"Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;TrustServerCertificate=True;Connection Timeout=30;\"|' ./CadastroNumeros.Api/appsettings.json
-
-      # Step 7: Run EF Core migrations to create the database schema
-      #- name: Run migrations
-      #  run: dotnet ef database update --project ./CadastroNumeros.Infra/CadastroNumeros.Infra.csproj
         
-      # Step 8: Run unit tests
+      # Step 5: Run unit tests
       - name: Run unit tests
         run: dotnet test --no-restore --verbosity normal
 

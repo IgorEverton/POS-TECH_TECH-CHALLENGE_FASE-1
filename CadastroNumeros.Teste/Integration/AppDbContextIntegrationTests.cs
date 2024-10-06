@@ -1,5 +1,6 @@
 ﻿using CadastroNumeros.Domain.Models;
 using CadastroNumeros.Infra.Data;
+using CadastroNumeros.Teste.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -7,27 +8,11 @@ namespace CadastroNumeros.Tests.Integration
 {
     public class AppDbContextIntegrationTests : IDisposable
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _context;        
 
         public AppDbContextIntegrationTests()
         {
-            var configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
-            .Build();
-
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            var connectionString = configuration.GetConnectionString("DefaultConnectionTesteIntegracao");
-
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new InvalidOperationException("Não foi encontrada nenhuma DefaultConnectionTesteIntegracao");
-            }
-
-            // Configurando o DbContext para usar a string de conexão vinda da variável de ambiente
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(connectionString)
-                .Options;
+            var options = DbOptionsCreator.CreateDbOptions();
 
             _context = new AppDbContext(options);
 
@@ -64,7 +49,6 @@ namespace CadastroNumeros.Tests.Integration
             Assert.Equal(contato.DataCriacao, contatoInserido.DataCriacao);
         }
 
-        // Limpeza do banco de dados após cada teste
         public void Dispose()
         {
             _context.Database.EnsureDeleted(); // Apagar o banco de dados para evitar conflitos em testes futuros
