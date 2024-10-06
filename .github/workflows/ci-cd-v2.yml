@@ -2,7 +2,7 @@ name: .NET Build and Test + BD
 
 on: 
   push:
-    branches: [ "Testes_integracao" ]
+    branches: [ "master" ]
 
 jobs:
   build-and-test:
