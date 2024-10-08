@@ -1,40 +1,93 @@
 ﻿using CadastroNumeros.Domain.Models;
-using Moq;
-using System;
-using Xunit;
+using System.ComponentModel.DataAnnotations;
 
 namespace CadastroNumeros.Teste.Models
 {
     public class ContatoTests
     {
-        private MockRepository mockRepository;
-
-
+        private Contato _contato;
 
         public ContatoTests()
         {
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-
-        }
-
-        private Contato CreateContato()
-        {
-            return new Contato();
+            _contato = new Contato
+            {
+                Id = Guid.NewGuid(),
+                DataCriacao = DateTime.Now,
+                Nome = "João Silva",
+                Idade = 30,
+                Email = "joao.silva@example.com",
+                Telefone = "123456789",
+                CodigoDdd = 11
+            };
         }
 
         [Fact]
-        public void TestMethod1()
+        public void Contato_EValido()
         {
-            // Arrange
-            var contato = this.CreateContato();
+            var context = new ValidationContext(_contato, null, null);
+            var results = new System.Collections.Generic.List<ValidationResult>();
 
-            // Act
+            var isValid = Validator.TryValidateObject(_contato, context, results, true);
 
+            Assert.True(isValid);
+            Assert.Empty(results);
+        }
 
-            // Assert
-            Assert.True(false);
-            this.mockRepository.VerifyAll();
+        [Fact]
+        public void Contato_Nome_MaiorQueOLimite_DeveFalharAValidacao()
+        {
+            _contato.Nome = new string('a', 101);
+
+            var context = new ValidationContext(_contato, null, null);
+            var results = new System.Collections.Generic.List<ValidationResult>();
+
+            var isValid = Validator.TryValidateObject(_contato, context, results, true);
+
+            Assert.False(isValid);
+            Assert.Contains(results, vr => vr.MemberNames.Contains(nameof(Contato.Nome)));
+        }
+
+        [Fact]
+        public void Contato_Email_FormatoInvalido_DeveFalharAValidacao()
+        {
+            _contato.Email = "emailinvalido";
+
+            var context = new ValidationContext(_contato, null, null);
+            var results = new System.Collections.Generic.List<ValidationResult>();
+
+            var isValid = Validator.TryValidateObject(_contato, context, results, true);
+
+            Assert.False(isValid);
+            Assert.Contains(results, vr => vr.MemberNames.Contains(nameof(Contato.Email)));
+        }
+
+        [Fact]
+        public void Contato_Telefone_MaiorQueOLimite_DeveFalharAValidacao()
+        {
+            _contato.Telefone = new string('1', 10);
+
+            var context = new ValidationContext(_contato, null, null);
+            var results = new System.Collections.Generic.List<ValidationResult>();
+
+            var isValid = Validator.TryValidateObject(_contato, context, results, true);
+
+            Assert.False(isValid);
+            Assert.Contains(results, vr => vr.MemberNames.Contains(nameof(Contato.Telefone)));
+        }
+
+        [Fact]
+        public void Contato_CodigoDdd_Invalido_DeveFalharAValidacao()
+        {
+            // Presuming DddValidation attribute checks for valid DDD codes.
+            _contato.CodigoDdd = 999;
+
+            var context = new ValidationContext(_contato, null, null);
+            var results = new System.Collections.Generic.List<ValidationResult>();
+
+            var isValid = Validator.TryValidateObject(_contato, context, results, true);
+
+            Assert.False(isValid);
+            Assert.Contains(results, vr => vr.MemberNames.Contains(nameof(Contato.CodigoDdd)));
         }
     }
 }

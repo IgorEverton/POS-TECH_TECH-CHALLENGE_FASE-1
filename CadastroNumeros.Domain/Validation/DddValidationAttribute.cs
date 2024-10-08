@@ -18,6 +18,9 @@ public class DddValidationAttribute : ValidationAttribute
 
     public override bool IsValid(object value)
     {
-        return DDDsValidos.Contains((int)value);
+       if (value is int intValue || (value is string stringValue && int.TryParse(stringValue, out intValue)))
+         return DDDsValidos.Contains(intValue);
+
+       return false;
     }
 }

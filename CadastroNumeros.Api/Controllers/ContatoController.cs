@@ -15,9 +15,10 @@ public class ContatoController : ControllerBase
     }
 
     [HttpGet("retornar-contatos")]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
     {
-        return Ok(await _service.ListarContatos());
+        var contatos = await _service.ListarContatos(pageNumber, pageSize);
+        return Ok(contatos);
     }
 
     [HttpGet("retornar-contato/{id}")]
@@ -49,18 +50,19 @@ public class ContatoController : ControllerBase
     {
         if (contato == null)
             return BadRequest("Contato não pode ser nulo");
-        
+
         try
         {
-            contato.Id = new Guid();
+            contato.Id = Guid.NewGuid(); // Gerar um novo GUID para o contato
             var contatoCriado = await _service.CriarContato(contato);
-            return CreatedAtAction(nameof(GetById), new { id = contatoCriado.Id }, contato);
+            return CreatedAtAction(nameof(GetById), new { id = contatoCriado.Id }, contatoCriado); // Retornar CreatedAtAction com o ID correto
         }
         catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+
     [HttpPut("atualizar-contato")]
     public async Task<IActionResult> PutAtualizacaoContato([FromBody] Contato contatoAtualizado)
     {
@@ -70,16 +72,10 @@ public class ContatoController : ControllerBase
         }
         try
         {
-            var contatoRecuperado = await _service.RetornarContato(contatoAtualizado.Id);
-            if (contatoRecuperado != null)
-            {
-                await _service.AtualizarContato(contatoRecuperado);
-                return Ok(contatoRecuperado);
-            }
-            else
-            {
-                return BadRequest("Contato não encontrado");
-            }
+            int linhasAtualizadas = await _service.AtualizarContato(contatoAtualizado);
+            return (linhasAtualizadas > 0) ?
+                Ok(contatoAtualizado)
+                : BadRequest("Contato não encontrado");
         }
         catch (Exception ex)
         {

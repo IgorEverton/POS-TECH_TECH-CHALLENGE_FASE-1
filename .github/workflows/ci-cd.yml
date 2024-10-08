@@ -1,0 +1,49 @@
+name: .NET Build and Test + BD
+
+on: 
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: "FiapC#1234"
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "exit 0" 
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+
+    steps:
+      # Step 1: Check out the code from the repository
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up .NET environment
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: dotnet restore
+
+      # Step 4:
+      - name: Update appsettings.json
+        run: |
+         sed -i 's|\"DefaultConnectionTesteIntegracao\": \"[^\"]*\"|\"DefaultConnectionTesteIntegracao\": \"Server=localhost,1433;Database=CadastroNumerosDB;User Id=sa;Password=FiapC#1234;TrustServerCertificate=True;Connection Timeout=30;\"|' ./CadastroNumeros.Api/appsettings.json
+        
+      # Step 5: Run unit tests
+      - name: Run unit tests
+        run: dotnet test --no-restore --verbosity normal
+
+      

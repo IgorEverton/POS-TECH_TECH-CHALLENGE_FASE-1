@@ -7,99 +7,123 @@ namespace CadastroNumeros.Teste.Services
 {
     public class ContatoServiceTests
     {
-        private MockRepository mockRepository;
-
-        private Mock<IContatoRepository> mockContatoRepository;
+        private readonly Mock<IContatoRepository> _mockContatoRepository;
+        private readonly ContatoService _contatoService;
 
         public ContatoServiceTests()
         {
-            this.mockRepository = new MockRepository(MockBehavior.Strict);
-
-            this.mockContatoRepository = this.mockRepository.Create<IContatoRepository>();
-        }
-
-        private ContatoService CreateService()
-        {
-            return new ContatoService(
-                this.mockContatoRepository.Object);
+            _mockContatoRepository = new Mock<IContatoRepository>();
+            _contatoService = new ContatoService(_mockContatoRepository.Object);
         }
 
         [Fact]
-        public async Task AtualizarContato_StateUnderTest_ExpectedBehavior()
+        public async Task CriarContato_DeveChamarRepositoryERetornarContato()
         {
-            // Arrange
-            var service = this.CreateService();
-            Contato contato = null;
+            var contato = new Contato
+            {
+                Id = Guid.NewGuid(),
+                Nome = "Carlos Silva",
+                Idade = 28,
+                Email = "carlos.silva@example.com",
+                Telefone = "987654321",
+                CodigoDdd = 21
+            };
 
-            // Act
-            await service.AtualizarContato(
-                contato);
+            _mockContatoRepository.Setup(repo => repo.CriarContato(contato))
+                .ReturnsAsync(contato);
 
-            // Assert
-            Assert.True(false);
-            this.mockRepository.VerifyAll();
+            var result = await _contatoService.CriarContato(contato);
+
+            _mockContatoRepository.Verify(repo => repo.CriarContato(contato), Times.Once);
+            Assert.Equal(contato, result);
         }
 
         [Fact]
-        public async Task CriarContato_StateUnderTest_ExpectedBehavior()
+        public async Task RetornarContato_DeveChamarRepositoryERetornarContato()
         {
-            // Arrange
-            var service = this.CreateService();
-            Contato contato = null;
+            var contatoId = Guid.NewGuid();
+            var contato = new Contato
+            {
+                Id = contatoId,
+                Nome = "Ana Souza",
+                Idade = 25,
+                Email = "ana.souza@example.com",
+                Telefone = "123456789",
+                CodigoDdd = 31
+            };
 
-            // Act
-            var result = await service.CriarContato(
-                contato);
+            _mockContatoRepository.Setup(repo => repo.RetornarContato(contatoId))
+                .ReturnsAsync(contato);
 
-            // Assert
-            Assert.True(false);
-            this.mockRepository.VerifyAll();
+            var result = await _contatoService.RetornarContato(contatoId);
+
+            _mockContatoRepository.Verify(repo => repo.RetornarContato(contatoId), Times.Once);
+            Assert.Equal(contato, result);
         }
 
         [Fact]
-        public async Task DeletarContato_StateUnderTest_ExpectedBehavior()
+        public async Task ListarContatos_DeveChamarRepositoryERetornarTodosOsContatos()
         {
-            // Arrange
-            var service = this.CreateService();
-            Guid Id = new Guid();
+            var contatos = new List<Contato>
+            {
+                new Contato { Id = Guid.NewGuid(), Nome = "Pedro Lima", Idade = 30, Email = "pedro.lima@example.com", Telefone = "111111111", CodigoDdd = 11 },
+                new Contato { Id = Guid.NewGuid(), Nome = "Maria Silva", Idade = 35, Email = "maria.silva@example.com", Telefone = "222222222", CodigoDdd = 21 }
+            };
 
-            // Act
-            await service.DeletarContato(
-                Id);
+            _mockContatoRepository.Setup(repo => repo.ListarContatos(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(contatos);
 
-            // Assert
-            Assert.True(false);
-            this.mockRepository.VerifyAll();
+            var result = await _contatoService.ListarContatos(1, 10);
+
+            _mockContatoRepository.Verify(repo => repo.ListarContatos(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            Assert.Equal(contatos, result);
         }
 
         [Fact]
-        public async Task ListarContatos_StateUnderTest_ExpectedBehavior()
+        public async Task ListarContatosPorDdd_DeveChamarRepositoryERetornarContatosComOsDDDs()
         {
-            // Arrange
-            var service = this.CreateService();
+            var ddd = 11;
+            var contatos = new List<Contato>
+            {
+                new Contato { Id = Guid.NewGuid(), Nome = "Pedro Lima", Idade = 30, Email = "pedro.lima@example.com", Telefone = "111111111", CodigoDdd = 11 },
+                new Contato { Id = Guid.NewGuid(), Nome = "José Almeida", Idade = 40, Email = "jose.almeida@example.com", Telefone = "333333333", CodigoDdd = 11 }
+            };
 
-            // Act
-            var result = await service.ListarContatos();
+            _mockContatoRepository.Setup(repo => repo.ListarContatosPorDdd(ddd))
+                .ReturnsAsync(contatos);
 
-            // Assert
-            Assert.True(false);
-            this.mockRepository.VerifyAll();
+            var result = await _contatoService.ListarContatosPorDdd(ddd);
+
+            _mockContatoRepository.Verify(repo => repo.ListarContatosPorDdd(ddd), Times.Once);
+            Assert.Equal(contatos, result);
         }
 
         [Fact]
-        public async Task RetornarContato_StateUnderTest_ExpectedBehavior()
+        public async Task AtualizarContato_DeveChamarORepository()
         {
-            // Arrange
-            var service = this.CreateService();
-            Guid id = new Guid();
+            var contato = new Contato
+            {
+                Id = Guid.NewGuid(),
+                Nome = "Pedro Lima",
+                Idade = 30,
+                Email = "pedro.lima@example.com",
+                Telefone = "111111111",
+                CodigoDdd = 11
+            };
 
-            // Act
-            var result = await service.RetornarContato(
-                id);
+            await _contatoService.AtualizarContato(contato);
 
-            // Assert
-            Assert.True(false);
-            this.mockRepository.VerifyAll();
+            _mockContatoRepository.Verify(repo => repo.AtualizarContato(contato), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeletarContato_DeveChamarORepository()
+        {
+            var contatoId = Guid.NewGuid();
+
+            await _contatoService.DeletarContato(contatoId);
+
+            _mockContatoRepository.Verify(repo => repo.DeletarContato(contatoId), Times.Once);
         }
     }
 }

@@ -50,8 +50,8 @@ namespace CadastroNumeros.Teste.Services
                 var result = await contatoService.CriarContato(contato);
 
                 //Assert
-                var contatos = await contatoService.ListarContatos();
-                Assert.Single(contatos);
+                var contatos = await contatoService.ListarContatos(1, 10);
+                Assert.Single(contatos);//
                 Assert.Equal(contatos.First(), result);
             }
 
@@ -70,7 +70,7 @@ namespace CadastroNumeros.Teste.Services
                 }
 
                 //Act
-                var result = await contatoService.ListarContatos();
+                var result = await contatoService.ListarContatos(1, 10);
 
                 //Assert
                 Assert.NotEqual(result, contatos);
@@ -84,7 +84,7 @@ namespace CadastroNumeros.Teste.Services
                 // Arrange
                 var contatoTeste = new ContatoStub().Get();
                 await contatoService.CriarContato(contatoTeste);
-                var contatos = await contatoService.ListarContatos();
+                var contatos = await contatoService.ListarContatos(1, 10);
                 var contato = contatos.First();
 
                 // Act
@@ -117,13 +117,13 @@ namespace CadastroNumeros.Teste.Services
             public async Task TestMethod1()
             {
                 // Arrange
-                var contatos = await contatoService.ListarContatos();
+                var contatos = await contatoService.ListarContatos(1, 10);
                 int quantidadeAnterior = contatos.Count();
                 var id = contatos.Last().Id;
 
                 // Act
                 await contatoService.DeletarContato(id);
-                var contatosAtuais = await contatoService.ListarContatos();
+                var contatosAtuais = await contatoService.ListarContatos(1, 10);
                 int quantidadeAtual = contatosAtuais.Count();
 
                 // Assert
