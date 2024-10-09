@@ -20,7 +20,7 @@ public class ContatoRepository : IContatoRepository
     /// <returns>Objeto do tipo Contato com as informações
     /// cadastradas no banco de dados
     /// </returns>
-    public async Task<Contato> CriarContato(Contato contato)
+    public async Task<Contato> CriarContatoAsync(Contato contato)
     {
         contato.DataCriacao = DateTime.Now.ToLocalTime();
 
@@ -36,7 +36,7 @@ public class ContatoRepository : IContatoRepository
     /// <returns>Retornar um objeto do tipo usuário 
     /// com as informações cadastradas no banco
     /// /returns>
-    public async Task<Contato> RetornarContato(Guid id)
+    public async Task<Contato> RetornarContatoAsync(Guid id)
     {
         return await _context.Contatos.FindAsync(id);
     }
@@ -45,7 +45,7 @@ public class ContatoRepository : IContatoRepository
     /// Método resposável por retornar todos os usuários cadastrados no banco de dados
     /// </summary>
     /// <returns>Lista de objetos do tipo Contato</returns>
-    public async Task<IEnumerable<Contato>> ListarContatos(int pageNumber = 1, int pageSize = 10)
+    public async Task<IEnumerable<Contato>> ListarContatosAsync(int pageNumber = 1, int pageSize = 10)
     {
         return await _context.Contatos
             .AsNoTracking()
@@ -58,16 +58,16 @@ public class ContatoRepository : IContatoRepository
     /// Método resposável por retornar contatos cadastrados no banco de dados por ddd
     /// </summary>
     /// <returns>Lista de objetos do tipo Contato</returns>
-    public async Task<IEnumerable<Contato>> ListarContatosPorDdd(int ddd)
+    public async Task<IEnumerable<Contato>> ListarContatosPorDddAsync(int ddd)
     {
-        return await _context.Contatos.Where(x => x.CodigoDdd == ddd).ToListAsync();
+        return await _context.Contatos.Where(x => x.CodigoDdd == ddd).AsNoTracking().ToListAsync();
     }
 
     /// <summary>
     /// Método responsável por atualizar as informações de um contato no banco de dados
     /// </summary>
     /// <param name="contato">Um objeto do tipo Contato</param>
-    public async Task<int> AtualizarContato(Contato contato)
+    public async Task<int> AtualizarContatoAsync(Contato contato)
     {
         _context.Contatos.Update(contato);
         return _context.SaveChanges();
@@ -77,7 +77,7 @@ public class ContatoRepository : IContatoRepository
     /// Método resposável por excluir um contato do banco de dados
     /// </summary>
     /// <param name="Id">Id do Contato</param>
-    public async Task DeletarContato(Guid id)
+    public async Task DeletarContatoAsync(Guid id)
     {
         var contatoEncontrado = await _context.Contatos.FindAsync(id);
         if (contatoEncontrado != null)

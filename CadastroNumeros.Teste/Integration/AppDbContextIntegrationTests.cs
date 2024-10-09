@@ -23,16 +23,21 @@ namespace CadastroNumeros.Tests.Integration
         [Fact]
         public async Task CanInsertContatoIntoDatabase()
         {
+            var nome = "João Silva";
+            var idade = 30;
+            var email = "joao.silva@email.com";
+            var telefone = "123456789";
+            var codigoDdd = 11;
             // Arrange: criar uma nova entidade Contato
             var contato = new Contato
             {
                 Id = Guid.NewGuid(),
                 DataCriacao = DateTime.UtcNow,
-                Nome = "João Silva",
-                Idade = 30,
-                Email = "joao.silva@email.com",
-                Telefone = "123456789",
-                CodigoDdd = 11
+                Nome = nome,
+                Idade = idade,
+                Email = email,
+                Telefone = telefone,
+                CodigoDdd = codigoDdd
             };
 
             // Act: adicionar e salvar a entidade no banco de dados
@@ -40,12 +45,12 @@ namespace CadastroNumeros.Tests.Integration
             await _context.SaveChangesAsync();
 
             // Assert: verificar se o contato foi inserido corretamente
-            var contatoInserido = await _context.Contatos.FirstOrDefaultAsync(c => c.Email == "joao.silva@email.com");
+            var contatoInserido = await _context.Contatos.FirstOrDefaultAsync(c => c.Email == email);
             Assert.NotNull(contatoInserido);
-            Assert.Equal("João Silva", contatoInserido.Nome);
-            Assert.Equal(30, contatoInserido.Idade);
-            Assert.Equal("123456789", contatoInserido.Telefone);
-            Assert.Equal(11, contatoInserido.CodigoDdd);
+            Assert.Equal(nome, contatoInserido.Nome);
+            Assert.Equal(idade, contatoInserido.Idade);
+            Assert.Equal(telefone, contatoInserido.Telefone);
+            Assert.Equal(codigoDdd, contatoInserido.CodigoDdd);
             Assert.Equal(contato.DataCriacao, contatoInserido.DataCriacao);
         }
 

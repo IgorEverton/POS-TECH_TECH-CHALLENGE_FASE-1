@@ -29,12 +29,12 @@ namespace CadastroNumeros.Teste.Services
                 CodigoDdd = 21
             };
 
-            _mockContatoRepository.Setup(repo => repo.CriarContato(contato))
+            _mockContatoRepository.Setup(repo => repo.CriarContatoAsync(contato))
                 .ReturnsAsync(contato);
 
-            var result = await _contatoService.CriarContato(contato);
+            var result = await _contatoService.CriarContatoAsync(contato);
 
-            _mockContatoRepository.Verify(repo => repo.CriarContato(contato), Times.Once);
+            _mockContatoRepository.Verify(repo => repo.CriarContatoAsync(contato), Times.Once);
             Assert.Equal(contato, result);
         }
 
@@ -52,12 +52,12 @@ namespace CadastroNumeros.Teste.Services
                 CodigoDdd = 31
             };
 
-            _mockContatoRepository.Setup(repo => repo.RetornarContato(contatoId))
+            _mockContatoRepository.Setup(repo => repo.RetornarContatoAsync(contatoId))
                 .ReturnsAsync(contato);
 
-            var result = await _contatoService.RetornarContato(contatoId);
+            var result = await _contatoService.RetornarContatoAsync(contatoId);
 
-            _mockContatoRepository.Verify(repo => repo.RetornarContato(contatoId), Times.Once);
+            _mockContatoRepository.Verify(repo => repo.RetornarContatoAsync(contatoId), Times.Once);
             Assert.Equal(contato, result);
         }
 
@@ -70,12 +70,12 @@ namespace CadastroNumeros.Teste.Services
                 new Contato { Id = Guid.NewGuid(), Nome = "Maria Silva", Idade = 35, Email = "maria.silva@example.com", Telefone = "222222222", CodigoDdd = 21 }
             };
 
-            _mockContatoRepository.Setup(repo => repo.ListarContatos(It.IsAny<int>(), It.IsAny<int>()))
+            _mockContatoRepository.Setup(repo => repo.ListarContatosAsync(It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync(contatos);
 
-            var result = await _contatoService.ListarContatos(1, 10);
+            var result = await _contatoService.ListarContatosAsync(1, 10);
 
-            _mockContatoRepository.Verify(repo => repo.ListarContatos(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            _mockContatoRepository.Verify(repo => repo.ListarContatosAsync(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
             Assert.Equal(contatos, result);
         }
 
@@ -89,12 +89,12 @@ namespace CadastroNumeros.Teste.Services
                 new Contato { Id = Guid.NewGuid(), Nome = "José Almeida", Idade = 40, Email = "jose.almeida@example.com", Telefone = "333333333", CodigoDdd = 11 }
             };
 
-            _mockContatoRepository.Setup(repo => repo.ListarContatosPorDdd(ddd))
+            _mockContatoRepository.Setup(repo => repo.ListarContatosPorDddAsync(ddd))
                 .ReturnsAsync(contatos);
 
-            var result = await _contatoService.ListarContatosPorDdd(ddd);
+            var result = await _contatoService.ListarContatosPorDddAsync(ddd);
 
-            _mockContatoRepository.Verify(repo => repo.ListarContatosPorDdd(ddd), Times.Once);
+            _mockContatoRepository.Verify(repo => repo.ListarContatosPorDddAsync(ddd), Times.Once);
             Assert.Equal(contatos, result);
         }
 
@@ -111,9 +111,9 @@ namespace CadastroNumeros.Teste.Services
                 CodigoDdd = 11
             };
 
-            await _contatoService.AtualizarContato(contato);
+            await _contatoService.AtualizarContatoAsync(contato);
 
-            _mockContatoRepository.Verify(repo => repo.AtualizarContato(contato), Times.Once);
+            _mockContatoRepository.Verify(repo => repo.AtualizarContatoAsync(contato), Times.Once);
         }
 
         [Fact]
@@ -121,9 +121,9 @@ namespace CadastroNumeros.Teste.Services
         {
             var contatoId = Guid.NewGuid();
 
-            await _contatoService.DeletarContato(contatoId);
+            await _contatoService.DeletarContatoAsync(contatoId);
 
-            _mockContatoRepository.Verify(repo => repo.DeletarContato(contatoId), Times.Once);
+            _mockContatoRepository.Verify(repo => repo.DeletarContatoAsync(contatoId), Times.Once);
         }
     }
 }

@@ -4,11 +4,11 @@ namespace CadastroNumeros.Infra.Interfaces.Repository
 {
     public interface IContatoRepository
     {
-        public Task<IEnumerable<Contato>> ListarContatosPorDdd(int ddd);
-        public Task<IEnumerable<Contato>> ListarContatos(int pageNumber, int pageSize);
-        public Task<Contato> RetornarContato(Guid id);
-        public Task<Contato> CriarContato(Contato contato);
-        public Task<int> AtualizarContato(Contato contato);
-        public Task DeletarContato(Guid Id);
+        public Task<IEnumerable<Contato>> ListarContatosPorDddAsync(int ddd);
+        public Task<IEnumerable<Contato>> ListarContatosAsync(int pageNumber, int pageSize);
+        public Task<Contato> RetornarContatoAsync(Guid id);
+        public Task<Contato> CriarContatoAsync(Contato contato);
+        public Task<int> AtualizarContatoAsync(Contato contato);
+        public Task DeletarContatoAsync(Guid Id);
     }
 }

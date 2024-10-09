@@ -15,16 +15,16 @@ public class ContatoController : ControllerBase
     }
 
     [HttpGet("retornar-contatos")]
-    public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
+    public async Task<IActionResult> GetAllAsync(int pageNumber = 1, int pageSize = 10)
     {
-        var contatos = await _service.ListarContatos(pageNumber, pageSize);
+        var contatos = await _service.ListarContatosAsync(pageNumber, pageSize);
         return Ok(contatos);
     }
 
     [HttpGet("retornar-contato/{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    public async Task<IActionResult> GetByIdAsync(Guid id)
     {
-        var contatoEncontrado = await _service.RetornarContato(id);
+        var contatoEncontrado = await _service.RetornarContatoAsync(id);
 
         if (contatoEncontrado != null)
         {
@@ -35,9 +35,9 @@ public class ContatoController : ControllerBase
     }
 
     [HttpGet("retornar-contatos-por-ddd/{ddd}")]
-    public async Task<IActionResult> GetById(int ddd)
+    public async Task<IActionResult> GetByIdAsync(int ddd)
     {
-        var listaContatos = await _service.ListarContatosPorDdd(ddd);
+        var listaContatos = await _service.ListarContatosPorDddAsync(ddd);
 
         if (listaContatos != null)
             return Ok(listaContatos);
@@ -46,7 +46,7 @@ public class ContatoController : ControllerBase
     }
 
     [HttpPost("inserir-contato")]
-    public async Task<IActionResult> PostInserirContato([FromBody] Contato contato)
+    public async Task<IActionResult> PostInserirContatoAsync([FromBody] Contato contato)
     {
         if (contato == null)
             return BadRequest("Contato não pode ser nulo");
@@ -54,8 +54,8 @@ public class ContatoController : ControllerBase
         try
         {
             contato.Id = Guid.NewGuid(); // Gerar um novo GUID para o contato
-            var contatoCriado = await _service.CriarContato(contato);
-            return CreatedAtAction(nameof(GetById), new { id = contatoCriado.Id }, contatoCriado); // Retornar CreatedAtAction com o ID correto
+            var contatoCriado = await _service.CriarContatoAsync(contato);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = contatoCriado.Id }, contatoCriado); // Retornar CreatedAtAction com o ID correto
         }
         catch (Exception ex)
         {
@@ -64,7 +64,7 @@ public class ContatoController : ControllerBase
     }
 
     [HttpPut("atualizar-contato")]
-    public async Task<IActionResult> PutAtualizacaoContato([FromBody] Contato contatoAtualizado)
+    public async Task<IActionResult> PutAtualizacaoContatoAsync([FromBody] Contato contatoAtualizado)
     {
         if (contatoAtualizado == null)
         {
@@ -72,10 +72,10 @@ public class ContatoController : ControllerBase
         }
         try
         {
-            int linhasAtualizadas = await _service.AtualizarContato(contatoAtualizado);
+            int linhasAtualizadas = await _service.AtualizarContatoAsync(contatoAtualizado);
             return (linhasAtualizadas > 0) ?
                 Ok(contatoAtualizado)
-                : BadRequest("Contato não encontrado");
+                : NotFound("Contato não encontrado");
         }
         catch (Exception ex)
         {
@@ -87,12 +87,12 @@ public class ContatoController : ControllerBase
     {
         try
         {
-            var contatoEncontrado = await _service.RetornarContato(id);
+            var contatoEncontrado = await _service.RetornarContatoAsync(id);
             if (contatoEncontrado == null)
             {
                 return NotFound("Contato não encontrado");
             }
-            await _service.DeletarContato(id);
+            await _service.DeletarContatoAsync(id);
             return NoContent();
         }
         catch (Exception ex)

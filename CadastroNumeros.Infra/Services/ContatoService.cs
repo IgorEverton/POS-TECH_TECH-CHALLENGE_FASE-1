@@ -12,33 +12,33 @@ public class ContatoService : IContatoService
     {
         _contatoRepository = contatoRepository;
     }
-    public async Task<int> AtualizarContato(Contato contato)
+    public async Task<int> AtualizarContatoAsync(Contato contato)
     {
-        return await _contatoRepository.AtualizarContato(contato);
+        return await _contatoRepository.AtualizarContatoAsync(contato);
     }
 
-    public async Task<Contato> CriarContato(Contato contato)
+    public async Task<Contato> CriarContatoAsync(Contato contato)
     {
-        return await _contatoRepository.CriarContato(contato);
+        return await _contatoRepository.CriarContatoAsync(contato);
     }
 
-    public async Task DeletarContato(Guid id)
+    public async Task DeletarContatoAsync(Guid id)
     {
-        await _contatoRepository.DeletarContato(id);
+        await _contatoRepository.DeletarContatoAsync(id);
     }
 
-    public async Task<IEnumerable<Contato>> ListarContatos(int pageNumber = 1, int pageSize = 10)
+    public async Task<IEnumerable<Contato>> ListarContatosAsync(int pageNumber = 1, int pageSize = 10)
     {
-        return await _contatoRepository.ListarContatos(pageNumber, pageSize);
+        return await _contatoRepository.ListarContatosAsync(pageNumber, pageSize);
     }
 
-    public async Task<IEnumerable<Contato>> ListarContatosPorDdd(int ddd)
+    public async Task<IEnumerable<Contato>> ListarContatosPorDddAsync(int ddd)
     {
-        return await _contatoRepository.ListarContatosPorDdd(ddd);
+        return await _contatoRepository.ListarContatosPorDddAsync(ddd);
     }
 
-    public async Task<Contato> RetornarContato(Guid id)
+    public async Task<Contato> RetornarContatoAsync(Guid id)
     {
-        return await _contatoRepository.RetornarContato(id);
+        return await _contatoRepository.RetornarContatoAsync(id);
     }
 }

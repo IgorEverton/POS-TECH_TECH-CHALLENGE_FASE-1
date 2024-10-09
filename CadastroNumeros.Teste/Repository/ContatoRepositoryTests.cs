@@ -34,7 +34,7 @@ namespace CadastroNumeros.Teste.Repository
                     CodigoDdd = 21
                 };
 
-                var result = await repository.CriarContato(contato);
+                var result = await repository.CriarContatoAsync(contato);
 
                 Assert.NotNull(result);
                 Assert.Equal("Carlos Silva", result.Nome);
@@ -65,7 +65,7 @@ namespace CadastroNumeros.Teste.Repository
                 context.Contatos.Add(contato);
                 context.SaveChanges();
 
-                var result = await repository.RetornarContato(contato.Id);
+                var result = await repository.RetornarContatoAsync(contato.Id);
 
                 Assert.NotNull(result);
                 Assert.Equal("Ana Souza", result.Nome);
@@ -90,7 +90,7 @@ namespace CadastroNumeros.Teste.Repository
                 context.Contatos.AddRange(contatos);
                 context.SaveChanges();
 
-                var result = await repository.ListarContatos(1, 10);
+                var result = await repository.ListarContatosAsync(1, 10);
 
                 Assert.Equal(2, result.Count());
             }
@@ -115,7 +115,7 @@ namespace CadastroNumeros.Teste.Repository
                 context.Contatos.AddRange(contatos);
                 context.SaveChanges();
 
-                var result = await repository.ListarContatosPorDdd(11);
+                var result = await repository.ListarContatosPorDddAsync(11);
 
                 Assert.Equal(2, result.Count());
                 Assert.All(result, c => Assert.Equal(11, c.CodigoDdd));
@@ -145,7 +145,7 @@ namespace CadastroNumeros.Teste.Repository
                 context.SaveChanges();
 
                 contato.Nome = "Pedro Silva";
-                await repository.AtualizarContato(contato);
+                await repository.AtualizarContatoAsync(contato);
 
                 var updatedContato = await context.Contatos.FindAsync(contato.Id);
                 Assert.Equal("Pedro Silva", updatedContato.Nome);
@@ -174,7 +174,7 @@ namespace CadastroNumeros.Teste.Repository
                 context.Contatos.Add(contato);
                 context.SaveChanges();
 
-                await repository.DeletarContato(contato.Id);
+                await repository.DeletarContatoAsync(contato.Id);
 
                 var deletedContato = await context.Contatos.FindAsync(contato.Id);
                 Assert.Null(deletedContato);
