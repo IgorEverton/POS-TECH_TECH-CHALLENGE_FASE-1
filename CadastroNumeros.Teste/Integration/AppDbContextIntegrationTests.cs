@@ -1,4 +1,5 @@
 ﻿using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Domain.ValueObjects;
 using CadastroNumeros.Infra.Data;
 using CadastroNumeros.Teste.Data;
 using Microsoft.EntityFrameworkCore;
@@ -25,15 +26,15 @@ namespace CadastroNumeros.Tests.Integration
         {
             // Arrange: criar uma nova entidade Contato
             var contato = new Contato
-            {
-                Id = Guid.NewGuid(),
-                DataCriacao = DateTime.UtcNow,
-                Nome = "João Silva",
-                Idade = 30,
-                Email = "joao.silva@email.com",
-                Telefone = "123456789",
-                CodigoDdd = 11
-            };
+            (
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                "João Silva",
+                30,
+                "joao.silva@email.com",
+                "123456789",
+                11
+            );
 
             // Act: adicionar e salvar a entidade no banco de dados
             await _context.Contatos.AddAsync(contato);

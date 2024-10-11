@@ -20,14 +20,15 @@ namespace CadastroNumeros.Teste.Services
         public async Task CriarContato_DeveChamarRepositoryERetornarContato()
         {
             var contato = new Contato
-            {
-                Id = Guid.NewGuid(),
-                Nome = "Carlos Silva",
-                Idade = 28,
-                Email = "carlos.silva@example.com",
-                Telefone = "987654321",
-                CodigoDdd = 21
-            };
+            (
+                Guid.NewGuid(),
+                new DateTime(),
+                "Carlos Silva",
+                28,
+                "carlos.silva@example.com",
+                "987654321",
+                21
+            );
 
             _mockContatoRepository.Setup(repo => repo.CriarContato(contato))
                 .ReturnsAsync(contato);
@@ -43,14 +44,15 @@ namespace CadastroNumeros.Teste.Services
         {
             var contatoId = Guid.NewGuid();
             var contato = new Contato
-            {
-                Id = contatoId,
-                Nome = "Ana Souza",
-                Idade = 25,
-                Email = "ana.souza@example.com",
-                Telefone = "123456789",
-                CodigoDdd = 31
-            };
+            (
+                contatoId,
+                new DateTime(),
+                "Ana Souza",
+                25,
+                "ana.souza@example.com",
+                "123456789",
+                31
+            );
 
             _mockContatoRepository.Setup(repo => repo.RetornarContato(contatoId))
                 .ReturnsAsync(contato);
@@ -66,8 +68,8 @@ namespace CadastroNumeros.Teste.Services
         {
             var contatos = new List<Contato>
             {
-                new Contato { Id = Guid.NewGuid(), Nome = "Pedro Lima", Idade = 30, Email = "pedro.lima@example.com", Telefone = "111111111", CodigoDdd = 11 },
-                new Contato { Id = Guid.NewGuid(), Nome = "Maria Silva", Idade = 35, Email = "maria.silva@example.com", Telefone = "222222222", CodigoDdd = 21 }
+                new Contato ( Guid.NewGuid(), new DateTime(),"Pedro Lima", 30, "pedro.lima@example.com", "111111111", 11 ),
+                new Contato ( Guid.NewGuid(), new DateTime(), "Maria Silva", 35, "maria.silva@example.com", "222222222", 21 )
             };
 
             _mockContatoRepository.Setup(repo => repo.ListarContatos(It.IsAny<int>(), It.IsAny<int>()))
@@ -85,8 +87,8 @@ namespace CadastroNumeros.Teste.Services
             var ddd = 11;
             var contatos = new List<Contato>
             {
-                new Contato { Id = Guid.NewGuid(), Nome = "Pedro Lima", Idade = 30, Email = "pedro.lima@example.com", Telefone = "111111111", CodigoDdd = 11 },
-                new Contato { Id = Guid.NewGuid(), Nome = "José Almeida", Idade = 40, Email = "jose.almeida@example.com", Telefone = "333333333", CodigoDdd = 11 }
+                new Contato ( Guid.NewGuid(), new DateTime(),"Pedro Lima", 30, "pedro.lima@example.com", "111111111", 11 ),
+                new Contato ( Guid.NewGuid(), new DateTime(), "José Almeida", 40, "jose.almeida@example.com", "333333333", 11 )
             };
 
             _mockContatoRepository.Setup(repo => repo.ListarContatosPorDdd(ddd))
@@ -102,14 +104,15 @@ namespace CadastroNumeros.Teste.Services
         public async Task AtualizarContato_DeveChamarORepository()
         {
             var contato = new Contato
-            {
-                Id = Guid.NewGuid(),
-                Nome = "Pedro Lima",
-                Idade = 30,
-                Email = "pedro.lima@example.com",
-                Telefone = "111111111",
-                CodigoDdd = 11
-            };
+            (
+                Guid.NewGuid(),
+                new DateTime(),
+                "Pedro Lima",
+                30,
+                "pedro.lima@example.com",
+                "111111111",
+                11
+            );
 
             await _contatoService.AtualizarContato(contato);
 

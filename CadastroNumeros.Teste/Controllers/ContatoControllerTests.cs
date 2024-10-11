@@ -1,6 +1,7 @@
 ﻿using CadastroNumeros.Api.Controllers;
 using CadastroNumeros.Domain.Models;
 using CadastroNumeros.Infra.Interfaces.Service;
+using FluentAssertions.Equivalency;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 
@@ -23,8 +24,8 @@ namespace CadastroNumeros.Teste.Controllers
             // Arrange
             var contatos = new List<Contato>
             {
-                new Contato { Id = Guid.NewGuid(), Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 },
-                new Contato { Id = Guid.NewGuid(), Nome = "Ana Souza", Idade = 25, Email = "ana.souza@example.com", Telefone = "123456789", CodigoDdd = 31 }
+                new Contato ( Guid.NewGuid(), new DateTime(), "Carlos Silva", 28, "carlos.silva@example.com", "987654321", 21 ),
+                new Contato ( Guid.NewGuid(), new DateTime(), "Ana Souza", 25, "ana.souza@example.com", "123456789", 31 )
             };
 
             _mockService.Setup(s => s.ListarContatos(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(contatos);
@@ -43,7 +44,7 @@ namespace CadastroNumeros.Teste.Controllers
         {
             // Arrange
             var contatoId = Guid.NewGuid();
-            var contato = new Contato { Id = contatoId, Nome = "Ana Souza", Idade = 25, Email = "ana.souza@example.com", Telefone = "123456789", CodigoDdd = 31 };
+            var contato = new Contato ( contatoId, new DateTime(), "Ana Souza", 25, "ana.souza@example.com", "123456789", 31 );
 
             _mockService.Setup(s => s.RetornarContato(contatoId)).ReturnsAsync(contato);
 
@@ -77,7 +78,7 @@ namespace CadastroNumeros.Teste.Controllers
             var ddd = 21;
             var contatos = new List<Contato>
             {
-                new Contato { Id = Guid.NewGuid(), Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 }
+                new Contato ( Guid.NewGuid(), new DateTime(),"Carlos Silva", 28, "carlos.silva@example.com", "987654321", 21 )
             };
 
             _mockService.Setup(s => s.ListarContatosPorDdd(ddd)).ReturnsAsync(contatos);
@@ -95,9 +96,9 @@ namespace CadastroNumeros.Teste.Controllers
         public async Task PostInserirContato_DeveRetornarCreatedAtAction()
         {
             // Arrange
-            var contato = new Contato { Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
             var createdContatoId = Guid.NewGuid(); // Gerar um GUID específico para o teste
-            var createdContato = new Contato { Id = createdContatoId, Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
+            var contato = new Contato (createdContatoId, new DateTime(), "Carlos Silva", 28, "carlos.silva@example.com", "987654321", 21 );
+            var createdContato = new Contato ( createdContatoId, new DateTime(),"Carlos Silva", 28, "carlos.silva@example.com", "987654321", 21 );
 
             _mockService.Setup(s => s.CriarContato(contato)).ReturnsAsync(createdContato);
 
@@ -117,7 +118,7 @@ namespace CadastroNumeros.Teste.Controllers
         public async Task PutAtualizacaoContato_DeveRetornarOk()
         {
             // Arrange
-            var contato = new Contato { Id = Guid.NewGuid(), Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
+            var contato = new Contato ( Guid.NewGuid(), new DateTime(), "Carlos Silva", 28, "carlos.silva@example.com", "987654321", 21 );
             var qtdLinhasAtualizadas = 1;
 
             _mockService.Setup(s => s.RetornarContato(contato.Id)).ReturnsAsync(contato);
@@ -136,7 +137,7 @@ namespace CadastroNumeros.Teste.Controllers
         public async Task PutAtualizacaoContato_DeveRetornarBadRequestSeContatoNaoForEncontrado()
         {
             // Arrange
-            var contato = new Contato { Id = Guid.NewGuid(), Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
+            var contato = new Contato ( Guid.NewGuid(), new DateTime(), "Carlos Silva", 28, "carlos.silva@example.com", "987654321", 21 );
 
             _mockService.Setup(s => s.RetornarContato(contato.Id)).ReturnsAsync((Contato)null);
 
@@ -153,7 +154,7 @@ namespace CadastroNumeros.Teste.Controllers
         {
             // Arrange
             var contatoId = Guid.NewGuid();
-            var contato = new Contato { Id = contatoId, Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
+            var contato = new Contato ( contatoId, new DateTime(),"Carlos Silva", 28, "carlos.silva@example.com", "987654321", 21 );
 
             _mockService.Setup(s => s.RetornarContato(contatoId)).ReturnsAsync(contato);
             _mockService.Setup(s => s.DeletarContato(contatoId)).Returns(Task.CompletedTask);

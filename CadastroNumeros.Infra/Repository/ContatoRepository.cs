@@ -22,7 +22,7 @@ public class ContatoRepository : IContatoRepository
     /// </returns>
     public async Task<Contato> CriarContato(Contato contato)
     {
-        contato.DataCriacao = DateTime.Now.ToLocalTime();
+        contato.SetDataCriacao(DateTime.Now.ToLocalTime());
 
         await _context.AddAsync(contato);
         _context.SaveChanges();

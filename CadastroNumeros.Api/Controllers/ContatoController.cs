@@ -53,7 +53,7 @@ public class ContatoController : ControllerBase
 
         try
         {
-            contato.Id = Guid.NewGuid(); // Gerar um novo GUID para o contato
+            contato.SetId(Guid.NewGuid()); // Gerar um novo GUID para o contato
             var contatoCriado = await _service.CriarContato(contato);
             return CreatedAtAction(nameof(GetById), new { id = contatoCriado.Id }, contatoCriado); // Retornar CreatedAtAction com o ID correto
         }
