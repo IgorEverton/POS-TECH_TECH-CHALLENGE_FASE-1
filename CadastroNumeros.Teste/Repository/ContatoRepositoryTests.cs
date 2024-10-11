@@ -1,6 +1,8 @@
 ﻿using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Domain.ValueObjects;
 using CadastroNumeros.Implementations;
 using CadastroNumeros.Infra.Data;
+using FluentAssertions.Equivalency;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel;
 
@@ -24,15 +26,18 @@ namespace CadastroNumeros.Teste.Repository
             using (var context = new AppDbContext(options))
             {
                 var repository = new ContatoRepository(context);
+                var email = new Email("carlos.silva@example.com");
+
                 var contato = new Contato
-                {
-                    Id = Guid.NewGuid(),
-                    Nome = "Carlos Silva",
-                    Idade = 28,
-                    Email = "carlos.silva@example.com",
-                    Telefone = "987654321",
-                    CodigoDdd = 21
-                };
+                (
+                    Guid.NewGuid(),
+                    new DateTime(),
+                    "Carlos Silva",
+                    28,
+                    "987654321",
+                    email,
+                    21
+                );
 
                 var result = await repository.CriarContatoAsync(contato);
 
@@ -52,15 +57,18 @@ namespace CadastroNumeros.Teste.Repository
             using (var context = new AppDbContext(options))
             {
                 var repository = new ContatoRepository(context);
+                var email = new Email("ana.souza@example.com");
+
                 var contato = new Contato
-                {
-                    Id = Guid.NewGuid(),
-                    Nome = "Ana Souza",
-                    Idade = 25,
-                    Email = "ana.souza@example.com",
-                    Telefone = "123456789",
-                    CodigoDdd = 31
-                };
+                (
+                    Guid.NewGuid(),
+                    new DateTime(),
+                    "Ana Souza",
+                    25,
+                    "123456789",
+                    email,
+                    31
+                );
 
                 context.Contatos.Add(contato);
                 context.SaveChanges();
@@ -81,10 +89,13 @@ namespace CadastroNumeros.Teste.Repository
             using (var context = new AppDbContext(options))
             {
                 var repository = new ContatoRepository(context);
+                var email1 = new Email("pedro.lima@example.com");
+                var email2 = new Email("maria.silva@example.com");
+
                 var contatos = new List<Contato>
                 {
-                    new Contato { Id = Guid.NewGuid(), Nome = "Pedro Lima", Idade = 30, Email = "pedro.lima@example.com", Telefone = "111111111", CodigoDdd = 11 },
-                    new Contato { Id = Guid.NewGuid(), Nome = "Maria Silva", Idade = 35, Email = "maria.silva@example.com", Telefone = "222222222", CodigoDdd = 21 }
+                    new Contato ( Guid.NewGuid(), new DateTime(), "Pedro Lima", 30, "111111111", email1, 11 ),
+                    new Contato ( Guid.NewGuid(), new DateTime(), "Maria Silva", 35, "222222222", email2, 21 )
                 };
 
                 context.Contatos.AddRange(contatos);
@@ -105,11 +116,15 @@ namespace CadastroNumeros.Teste.Repository
             using (var context = new AppDbContext(options))
             {
                 var repository = new ContatoRepository(context);
+                var email1 = new Email("pedro.lima@example.com");
+                var email2 = new Email("maria.silva@example.com");
+                var email3 = new Email("jose.almeida@example.com");
+
                 var contatos = new List<Contato>
                 {
-                    new Contato { Id = Guid.NewGuid(), Nome = "Pedro Lima", Idade = 30, Email = "pedro.lima@example.com", Telefone = "111111111", CodigoDdd = 11 },
-                    new Contato { Id = Guid.NewGuid(), Nome = "Maria Silva", Idade = 35, Email = "maria.silva@example.com", Telefone = "222222222", CodigoDdd = 21 },
-                    new Contato { Id = Guid.NewGuid(), Nome = "José Almeida", Idade = 40, Email = "jose.almeida@example.com", Telefone = "333333333", CodigoDdd = 11 }
+                    new Contato ( Guid.NewGuid(), new DateTime(), "Pedro Lima", 30, "111111111", email1, 11 ),
+                    new Contato ( Guid.NewGuid(), new DateTime(), "Maria Silva", 35, "222222222", email2, 21 ),
+                    new Contato ( Guid.NewGuid(), new DateTime(), "José Almeida", 40, "333333333", email3, 11 )
                 };
 
                 context.Contatos.AddRange(contatos);
@@ -131,20 +146,23 @@ namespace CadastroNumeros.Teste.Repository
             using (var context = new AppDbContext(options))
             {
                 var repository = new ContatoRepository(context);
+                var email = new Email("pedro.lima@example.com");
+
                 var contato = new Contato
-                {
-                    Id = Guid.NewGuid(),
-                    Nome = "Pedro Lima",
-                    Idade = 30,
-                    Email = "pedro.lima@example.com",
-                    Telefone = "111111111",
-                    CodigoDdd = 11
-                };
+                (
+                    Guid.NewGuid(),
+                    new DateTime(),
+                    "Pedro Lima",
+                    30,
+                    "111111111",
+                    email,
+                    11
+                );
 
                 context.Contatos.Add(contato);
                 context.SaveChanges();
 
-                contato.Nome = "Pedro Silva";
+                contato.SetNome("Pedro Silva");
                 await repository.AtualizarContatoAsync(contato);
 
                 var updatedContato = await context.Contatos.FindAsync(contato.Id);
@@ -161,15 +179,18 @@ namespace CadastroNumeros.Teste.Repository
             using (var context = new AppDbContext(options))
             {
                 var repository = new ContatoRepository(context);
+                var email = new Email("ana.souza@example.com");
+
                 var contato = new Contato
-                {
-                    Id = Guid.NewGuid(),
-                    Nome = "Ana Souza",
-                    Idade = 25,
-                    Email = "ana.souza@example.com",
-                    Telefone = "123456789",
-                    CodigoDdd = 31
-                };
+                (
+                    Guid.NewGuid(),
+                    new DateTime(),
+                    "Ana Souza",
+                    25,
+                    "123456789",
+                    email,
+                    31
+                );
 
                 context.Contatos.Add(contato);
                 context.SaveChanges();

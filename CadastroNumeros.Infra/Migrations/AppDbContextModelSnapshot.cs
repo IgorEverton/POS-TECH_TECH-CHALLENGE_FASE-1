@@ -34,10 +34,10 @@ namespace CadastroNumeros.Infra.Migrations
                     b.Property<DateTime>("DataCriacao")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    //b.Property<string>("Email")
+                    //    .IsRequired()
+                    //    .HasMaxLength(100)
+                    //    .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("Idade")
                         .HasColumnType("int");

@@ -1,4 +1,5 @@
 ﻿using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Domain.ValueObjects;
 using CadastroNumeros.Infra.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,16 +21,29 @@ namespace CadastroNumeros.Teste.Data
 
             using (var context = new AppDbContext(options))
             {
+                //var contato = new Contato
+                //{
+                //    Id = Guid.NewGuid(),
+                //    DataCriacao = DateTime.Now,
+                //    Nome = "Maria Silva",
+                //    Idade = 25,
+                //    Email = "maria.silva@example.com",
+                //    Telefone = "987654321",
+                //    CodigoDdd = 11
+                //};
+
+                var email = new Email("maria.silva@example.com");
+
                 var contato = new Contato
-                {
-                    Id = Guid.NewGuid(),
-                    DataCriacao = DateTime.Now,
-                    Nome = "Maria Silva",
-                    Idade = 25,
-                    Email = "maria.silva@example.com",
-                    Telefone = "987654321",
-                    CodigoDdd = 11
-                };
+                (
+                    Guid.NewGuid(),
+                    DateTime.Now,
+                    "Maria Silva",
+                    25,
+                    "987654321",
+                    email,
+                    11
+                );
 
                 context.Contatos.Add(contato);
                 context.SaveChanges();
@@ -46,16 +60,18 @@ namespace CadastroNumeros.Teste.Data
 
             using (var context = new AppDbContext(options))
             {
+                var email = new Email("joao.silva@example.com");
+
                 var contato = new Contato
-                {
-                    Id = Guid.NewGuid(),
-                    DataCriacao = DateTime.Now,
-                    Nome = "João Silva",
-                    Idade = 30,
-                    Email = "joao.silva@example.com",
-                    Telefone = "123456789",
-                    CodigoDdd = 11
-                };
+                (
+                    Guid.NewGuid(),
+                    DateTime.Now,
+                    "João Silva",
+                    30,
+                    "123456789",
+                    email,
+                    11
+                );
 
                 context.Contatos.Add(contato);
                 context.SaveChanges();
@@ -79,21 +95,23 @@ namespace CadastroNumeros.Teste.Data
 
             using (var context = new AppDbContext(options))
             {
+                var email = new Email("pedro.silva@example.com");
+
                 var contato = new Contato
-                {
-                    Id = Guid.NewGuid(),
-                    DataCriacao = DateTime.Now,
-                    Nome = "Pedro Silva",
-                    Idade = 40,
-                    Email = "pedro.silva@example.com",
-                    Telefone = "1122334455",
-                    CodigoDdd = 21
-                };
+                (
+                    Guid.NewGuid(),
+                    DateTime.Now,
+                    "Pedro Silva",
+                    40,
+                    "1122334455",
+                    email,
+                    21
+                );
 
                 context.Contatos.Add(contato);
                 context.SaveChanges();
 
-                contato.Nome = "Pedro Souza";
+                contato.SetNome("Pedro Souza");
                 context.Contatos.Update(contato);
                 context.SaveChanges();
             }
@@ -116,16 +134,18 @@ namespace CadastroNumeros.Teste.Data
 
             using (var context = new AppDbContext(options))
             {
+                var email = new Email("ana.silva@example.com");
+
                 var contato = new Contato
-                {
-                    Id = Guid.NewGuid(),
-                    DataCriacao = DateTime.Now,
-                    Nome = "Ana Silva",
-                    Idade = 35,
-                    Email = "ana.silva@example.com",
-                    Telefone = "9988776655",
-                    CodigoDdd = 31
-                };
+                (
+                    Guid.NewGuid(),
+                    DateTime.Now,
+                    "Ana Silva",
+                    35,
+                    "9988776655",
+                    email,
+                    31
+                );
 
                 context.Contatos.Add(contato);
                 context.SaveChanges();

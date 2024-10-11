@@ -14,6 +14,7 @@ namespace CadastroNumeros.Infra.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Contato>();
+            modelBuilder.ApplyConfiguration(new ContatoEntityTypeConfiguration());
         }
     }
 }

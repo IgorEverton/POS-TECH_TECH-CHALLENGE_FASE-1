@@ -1,6 +1,7 @@
 ﻿using CadastroNumeros.Infra.Interfaces.Service;
 using CadastroNumeros.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace CadastroNumeros.Api.Controllers;
 
@@ -53,7 +54,7 @@ public class ContatoController : ControllerBase
 
         try
         {
-            contato.Id = Guid.NewGuid(); // Gerar um novo GUID para o contato
+            contato.SetId(Guid.NewGuid()); // Gerar um novo GUID para o contato
             var contatoCriado = await _service.CriarContatoAsync(contato);
             return CreatedAtAction(nameof(GetByIdAsync), new { id = contatoCriado.Id }, contatoCriado); // Retornar CreatedAtAction com o ID correto
         }

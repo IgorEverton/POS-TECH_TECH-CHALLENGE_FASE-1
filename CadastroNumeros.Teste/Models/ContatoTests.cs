@@ -1,4 +1,5 @@
 ﻿using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Domain.ValueObjects;
 using System.ComponentModel.DataAnnotations;
 
 namespace CadastroNumeros.Teste.Models
@@ -9,16 +10,18 @@ namespace CadastroNumeros.Teste.Models
 
         public ContatoTests()
         {
+            var email = new Email("joao.silva@example.com");
+
             _contato = new Contato
-            {
-                Id = Guid.NewGuid(),
-                DataCriacao = DateTime.Now,
-                Nome = "João Silva",
-                Idade = 30,
-                Email = "joao.silva@example.com",
-                Telefone = "123456789",
-                CodigoDdd = 11
-            };
+            (
+                Guid.NewGuid(),
+                DateTime.Now,
+                "João Silva",
+                30,
+                "123456789",
+                email,
+                11
+            );
         }
 
         [Fact]
@@ -36,7 +39,7 @@ namespace CadastroNumeros.Teste.Models
         [Fact]
         public void Contato_Nome_MaiorQueOLimite_DeveFalharAValidacao()
         {
-            _contato.Nome = new string('a', 101);
+            _contato.SetNome(new string('a', 101));
 
             var context = new ValidationContext(_contato, null, null);
             var results = new System.Collections.Generic.List<ValidationResult>();
@@ -50,7 +53,7 @@ namespace CadastroNumeros.Teste.Models
         [Fact]
         public void Contato_Email_FormatoInvalido_DeveFalharAValidacao()
         {
-            _contato.Email = "emailinvalido";
+            _contato.SetEmail("emailinvalido");
 
             var context = new ValidationContext(_contato, null, null);
             var results = new System.Collections.Generic.List<ValidationResult>();
@@ -64,7 +67,8 @@ namespace CadastroNumeros.Teste.Models
         [Fact]
         public void Contato_Telefone_MaiorQueOLimite_DeveFalharAValidacao()
         {
-            _contato.Telefone = new string('1', 10);
+            var telefone = new string('1', 10);
+            _contato.SetTelefone(telefone);
 
             var context = new ValidationContext(_contato, null, null);
             var results = new System.Collections.Generic.List<ValidationResult>();
@@ -79,7 +83,7 @@ namespace CadastroNumeros.Teste.Models
         public void Contato_CodigoDdd_Invalido_DeveFalharAValidacao()
         {
             // Presuming DddValidation attribute checks for valid DDD codes.
-            _contato.CodigoDdd = 999;
+            _contato.SetCodigoDdd(999);
 
             var context = new ValidationContext(_contato, null, null);
             var results = new System.Collections.Generic.List<ValidationResult>();
