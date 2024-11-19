@@ -1,4 +1,7 @@
-﻿namespace CadastroNumeros.Domain.ValueObjects
+﻿using System.Net;
+using System.Text.RegularExpressions;
+
+namespace CadastroNumeros.Domain.ValueObjects
 {
     public class Email : ValueObject
     {
@@ -17,6 +20,12 @@
         public Email(string endereco)
         {
             if (string.IsNullOrEmpty(endereco) || endereco.Length < 5)
+                throw new Exception("Email inválido");
+
+            Endereco = endereco.ToLower().Trim();
+            const string pattern = @"^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$";
+
+            if (!Regex.IsMatch(endereco, pattern))
                 throw new Exception("Email inválido");
 
             Endereco = endereco;

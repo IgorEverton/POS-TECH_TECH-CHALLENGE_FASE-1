@@ -15,8 +15,8 @@ public class Contato
 
     public virtual int? Idade { get; protected set; }
 
-    [EmailAddress]
-    [MaxLength(100)]
+    //[EmailAddress]
+    //[MaxLength(100)]
     public virtual Email Email { get; private set; }
 
     [MaxLength(9)]
