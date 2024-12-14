@@ -23,7 +23,7 @@ builder.Services.AddSwaggerGen(c =>
 var connectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.ResolverDependencias();
+builder.Services.ResolverDependencias(configuration);
 
 var app = builder.Build();
 

@@ -1,4 +1,5 @@
 ﻿using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Infra.Interfaces.Queues;
 using CadastroNumeros.Infra.Interfaces.Repository;
 using CadastroNumeros.Infra.Services;
 using Moq;
@@ -9,11 +10,13 @@ namespace CadastroNumeros.Teste.Services
     {
         private readonly Mock<IContatoRepository> _mockContatoRepository;
         private readonly ContatoService _contatoService;
+        private readonly Mock<IRabbitMQPublisher<Contato>> _rabbitPublisher;
 
         public ContatoServiceTests()
         {
             _mockContatoRepository = new Mock<IContatoRepository>();
-            _contatoService = new ContatoService(_mockContatoRepository.Object);
+            _rabbitPublisher = new Mock<IRabbitMQPublisher<Contato>>();
+            _contatoService = new ContatoService(_mockContatoRepository.Object, _rabbitPublisher.Object);
         }
 
         [Fact]

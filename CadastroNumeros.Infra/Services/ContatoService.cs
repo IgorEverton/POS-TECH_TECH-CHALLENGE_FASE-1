@@ -1,16 +1,20 @@
 ﻿using CadastroNumeros.Infra.Interfaces.Repository;
 using CadastroNumeros.Infra.Interfaces.Service;
 using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Infra.Interfaces.Queues;
+using CadastroNumeros.Domain.Configuration.Queues.RabbitMQ;
 
 namespace CadastroNumeros.Infra.Services;
 
 public class ContatoService : IContatoService
 {
     private readonly IContatoRepository _contatoRepository;
+    private readonly IRabbitMQPublisher<Contato> _contatoPublisher;
 
-    public ContatoService(IContatoRepository contatoRepository)
+    public ContatoService(IContatoRepository contatoRepository, IRabbitMQPublisher<Contato> publisher)
     {
         _contatoRepository = contatoRepository;
+        _contatoPublisher = publisher;
     }
     public async Task<int> AtualizarContato(Contato contato)
     {
@@ -19,6 +23,8 @@ public class ContatoService : IContatoService
 
     public async Task<Contato> CriarContato(Contato contato)
     {
+        await _contatoPublisher.PublishMessageAsync(contato, RabbitMQQueues.CadastroContatoQueue);
+
         return await _contatoRepository.CriarContato(contato);
     }
 
