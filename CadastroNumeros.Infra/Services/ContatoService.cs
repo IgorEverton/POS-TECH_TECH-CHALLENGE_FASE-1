@@ -3,34 +3,66 @@ using CadastroNumeros.Infra.Interfaces.Service;
 using CadastroNumeros.Domain.Models;
 using CadastroNumeros.Infra.Interfaces.Queues;
 using CadastroNumeros.Domain.Configuration.Queues.RabbitMQ;
+using CadastroNumeros.Domain.Configuration.CustomMessages;
 
 namespace CadastroNumeros.Infra.Services;
 
-public class ContatoService : IContatoService
+public class ContatoService : ServiceBase, IContatoService
 {
     private readonly IContatoRepository _contatoRepository;
-    private readonly IRabbitMQPublisher<Contato> _contatoPublisher;
+    private readonly IRabbitMQPublisher<CadastroSolicitacao> _contatoPublisher;
 
-    public ContatoService(IContatoRepository contatoRepository, IRabbitMQPublisher<Contato> publisher)
+    public ContatoService(IContatoRepository contatoRepository, IRabbitMQPublisher<CadastroSolicitacao> publisher)
     {
         _contatoRepository = contatoRepository;
         _contatoPublisher = publisher;
     }
-    public async Task<int> AtualizarContato(Contato contato)
+    public async Task<SolicitacaoResult> AtualizarContato(Contato contato)
     {
-        return await _contatoRepository.AtualizarContato(contato);
+        try
+        {
+            var solicitacao = new CadastroSolicitacao() { Contato = contato, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Alterar };
+
+            await _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue);
+
+            return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
+        }
+        catch (Exception ex)
+        {
+            return RetornaResultado($"{ReturnMessages.SolicitacaoNaoRealizada}{ex.Message}", false);
+        }
     }
 
-    public async Task<Contato> CriarContato(Contato contato)
+    public async Task<SolicitacaoResult> CriarContato(Contato contato)
     {
-        await _contatoPublisher.PublishMessageAsync(contato, RabbitMQQueues.CadastroContatoQueue);
+        try
+        {
+            var solicitacao = new CadastroSolicitacao() { Contato = contato, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Inserir };
 
-        return await _contatoRepository.CriarContato(contato);
+            await _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue);
+
+            return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
+        }
+        catch (Exception ex)
+        {
+            return RetornaResultado($"{ReturnMessages.SolicitacaoNaoRealizada}{ex.Message}", false);
+        }
     }
 
-    public async Task DeletarContato(Guid id)
+    public async Task<SolicitacaoResult> DeletarContato(Guid id)
     {
-        await _contatoRepository.DeletarContato(id);
+        try
+        {
+            var solicitacao = new CadastroSolicitacao() { Contato = new() { Id = id}, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Alterar };
+
+            await _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue);
+
+            return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
+        }
+        catch (Exception ex)
+        {
+            return RetornaResultado($"{ReturnMessages.SolicitacaoNaoRealizada}{ex.Message}", false);
+        }
     }
 
     public async Task<IEnumerable<Contato>> ListarContatos(int pageNumber = 1, int pageSize = 10)

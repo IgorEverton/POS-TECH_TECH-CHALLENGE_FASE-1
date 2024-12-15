@@ -7,8 +7,8 @@ namespace CadastroNumeros.Infra.Interfaces.Service
         public Task<IEnumerable<Contato>> ListarContatosPorDdd(int ddd);
         public Task<IEnumerable<Contato>> ListarContatos(int pageNumber, int pageSize);
         public Task<Contato> RetornarContato(Guid id);
-        public Task<Contato> CriarContato(Contato contato);
-        public Task<int> AtualizarContato(Contato contato);
-        public Task DeletarContato(Guid Id);
+        public Task<SolicitacaoResult> CriarContato(Contato contato);
+        public Task<SolicitacaoResult> AtualizarContato(Contato contato);
+        public Task<SolicitacaoResult> DeletarContato(Guid Id);
     }
 }
