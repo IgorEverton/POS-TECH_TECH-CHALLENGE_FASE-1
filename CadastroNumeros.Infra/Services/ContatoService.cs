@@ -4,6 +4,8 @@ using CadastroNumeros.Domain.Models;
 using CadastroNumeros.Infra.Interfaces.Queues;
 using CadastroNumeros.Domain.Configuration.Queues.RabbitMQ;
 using CadastroNumeros.Domain.Configuration.CustomMessages;
+using Polly.CircuitBreaker;
+using CadastroNumeros.Infra.Polices;
 
 namespace CadastroNumeros.Infra.Services;
 
@@ -11,11 +13,15 @@ public class ContatoService : ServiceBase, IContatoService
 {
     private readonly IContatoRepository _contatoRepository;
     private readonly IRabbitMQPublisher<CadastroSolicitacao> _contatoPublisher;
+    private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;
 
-    public ContatoService(IContatoRepository contatoRepository, IRabbitMQPublisher<CadastroSolicitacao> publisher)
+    public ContatoService(IContatoRepository contatoRepository, 
+                          IRabbitMQPublisher<CadastroSolicitacao> publisher, 
+                          CircuitBreakerPolicyProvider policyProvider)
     {
         _contatoRepository = contatoRepository;
         _contatoPublisher = publisher;
+        _circuitBreakerPolicy = policyProvider.GetPolicy();
     }
     public async Task<SolicitacaoResult> AtualizarContato(Contato contato)
     {
@@ -23,7 +29,8 @@ public class ContatoService : ServiceBase, IContatoService
         {
             var solicitacao = new CadastroSolicitacao() { Contato = contato, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Alterar };
 
-            await _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue);
+            await _circuitBreakerPolicy.ExecuteAsync(() =>
+                    _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue));
 
             return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
         }
@@ -39,7 +46,8 @@ public class ContatoService : ServiceBase, IContatoService
         {
             var solicitacao = new CadastroSolicitacao() { Contato = contato, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Inserir };
 
-            await _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue);
+            await _circuitBreakerPolicy.ExecuteAsync(() =>
+                    _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue));
 
             return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
         }
@@ -55,7 +63,8 @@ public class ContatoService : ServiceBase, IContatoService
         {
             var solicitacao = new CadastroSolicitacao() { Contato = new() { Id = id}, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Alterar };
 
-            await _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue);
+            await _circuitBreakerPolicy.ExecuteAsync(() =>
+                    _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue));
 
             return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
         }

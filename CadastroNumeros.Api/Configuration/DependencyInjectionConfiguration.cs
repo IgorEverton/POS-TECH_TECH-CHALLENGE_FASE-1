@@ -3,6 +3,7 @@ using CadastroNumeros.Implementations;
 using CadastroNumeros.Infra.Interfaces.Queues;
 using CadastroNumeros.Infra.Interfaces.Repository;
 using CadastroNumeros.Infra.Interfaces.Service;
+using CadastroNumeros.Infra.Polices;
 using CadastroNumeros.Infra.Queues.RabbitMQ;
 using CadastroNumeros.Infra.Services;
 
@@ -18,6 +19,7 @@ public static class DependencyInjectionConfiguration
 
         services.Configure<RabbitMQSetting>(configuration.GetSection("RabbitMQ"));
         services.AddScoped(typeof(IRabbitMQPublisher<>), typeof(RabbitMQPublisher<>));
+        services.AddSingleton<CircuitBreakerPolicyProvider>();
 
         return services;
     }
