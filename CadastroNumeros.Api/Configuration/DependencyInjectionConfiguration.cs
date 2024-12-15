@@ -1,5 +1,6 @@
 ﻿using CadastroNumeros.Domain.Configuration.IOptions;
 using CadastroNumeros.Implementations;
+using CadastroNumeros.Infra.Interfaces.Polices;
 using CadastroNumeros.Infra.Interfaces.Queues;
 using CadastroNumeros.Infra.Interfaces.Repository;
 using CadastroNumeros.Infra.Interfaces.Service;
@@ -19,7 +20,7 @@ public static class DependencyInjectionConfiguration
 
         services.Configure<RabbitMQSetting>(configuration.GetSection("RabbitMQ"));
         services.AddScoped(typeof(IRabbitMQPublisher<>), typeof(RabbitMQPublisher<>));
-        services.AddSingleton<CircuitBreakerPolicyProvider>();
+        services.AddSingleton<ICircuitBreakerPolicyProvider, CircuitBreakerPolicyProvider>();
 
         return services;
     }

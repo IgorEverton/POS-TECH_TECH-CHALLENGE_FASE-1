@@ -6,6 +6,7 @@ using CadastroNumeros.Domain.Configuration.Queues.RabbitMQ;
 using CadastroNumeros.Domain.Configuration.CustomMessages;
 using Polly.CircuitBreaker;
 using CadastroNumeros.Infra.Polices;
+using CadastroNumeros.Infra.Interfaces.Polices;
 
 namespace CadastroNumeros.Infra.Services;
 
@@ -16,8 +17,8 @@ public class ContatoService : ServiceBase, IContatoService
     private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;
 
     public ContatoService(IContatoRepository contatoRepository, 
-                          IRabbitMQPublisher<CadastroSolicitacao> publisher, 
-                          CircuitBreakerPolicyProvider policyProvider)
+                          IRabbitMQPublisher<CadastroSolicitacao> publisher,
+                          ICircuitBreakerPolicyProvider policyProvider)
     {
         _contatoRepository = contatoRepository;
         _contatoPublisher = publisher;
@@ -34,6 +35,10 @@ public class ContatoService : ServiceBase, IContatoService
 
             return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
         }
+        catch (BrokenCircuitException)
+        {
+            return RetornaResultado(ReturnMessages.ServicoIndisponivel, false);
+        }
         catch (Exception ex)
         {
             return RetornaResultado($"{ReturnMessages.SolicitacaoNaoRealizada}{ex.Message}", false);
@@ -46,16 +51,22 @@ public class ContatoService : ServiceBase, IContatoService
         {
             var solicitacao = new CadastroSolicitacao() { Contato = contato, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Inserir };
 
+            // Execute a chamada à fila RabbitMQ com o Circuit Breaker
             await _circuitBreakerPolicy.ExecuteAsync(() =>
                     _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue));
 
             return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
+        }
+        catch (BrokenCircuitException)
+        {
+            return RetornaResultado(ReturnMessages.ServicoIndisponivel, false);
         }
         catch (Exception ex)
         {
             return RetornaResultado($"{ReturnMessages.SolicitacaoNaoRealizada}{ex.Message}", false);
         }
     }
+
 
     public async Task<SolicitacaoResult> DeletarContato(Guid id)
     {
@@ -67,6 +78,10 @@ public class ContatoService : ServiceBase, IContatoService
                     _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue));
 
             return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
+        }
+        catch (BrokenCircuitException)
+        {
+            return RetornaResultado(ReturnMessages.ServicoIndisponivel, false);
         }
         catch (Exception ex)
         {

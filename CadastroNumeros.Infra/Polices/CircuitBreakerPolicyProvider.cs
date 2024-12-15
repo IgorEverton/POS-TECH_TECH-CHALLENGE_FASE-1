@@ -1,14 +1,10 @@
-﻿using Polly.CircuitBreaker;
+﻿using CadastroNumeros.Infra.Interfaces.Polices;
 using Polly;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Polly.CircuitBreaker;
 
 namespace CadastroNumeros.Infra.Polices
 {
-    public class CircuitBreakerPolicyProvider
+    public class CircuitBreakerPolicyProvider : ICircuitBreakerPolicyProvider
     {
         private readonly AsyncCircuitBreakerPolicy _policy;
 
