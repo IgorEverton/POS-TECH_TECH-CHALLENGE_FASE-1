@@ -82,7 +82,7 @@ namespace CadastroNumeros.Contato.Consumer.Consumers
             await _channel.BasicConsumeAsync(queue: queueName, autoAck: false, consumer: consumer);
         }
 
-        private async Task<bool> ProcessMessageAsync(string message)
+        public async Task<bool> ProcessMessageAsync(string message)
         {
             try
             {
