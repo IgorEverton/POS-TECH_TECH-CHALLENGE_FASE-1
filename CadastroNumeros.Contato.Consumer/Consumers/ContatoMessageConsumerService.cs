@@ -44,7 +44,7 @@ namespace CadastroNumeros.Contato.Consumer.Consumers
 
         private async Task StartConsuming(string queueName, CancellationToken cancellationToken)
         {
-            await _channel.QueueDeclareAsync(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+            await _channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.ReceivedAsync += async (model, ea) =>

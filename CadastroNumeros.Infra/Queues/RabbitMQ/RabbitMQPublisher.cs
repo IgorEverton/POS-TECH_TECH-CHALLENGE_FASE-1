@@ -28,7 +28,7 @@ namespace CadastroNumeros.Infra.Queues.RabbitMQ
 
             using var connection = await factory.CreateConnectionAsync();
             using var channel = await connection.CreateChannelAsync();
-            await channel.QueueDeclareAsync(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+            await channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
             var messageJson = JsonConvert.SerializeObject(message);
             var body = Encoding.UTF8.GetBytes(messageJson);
