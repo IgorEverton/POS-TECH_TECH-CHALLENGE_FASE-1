@@ -1,6 +1,8 @@
 ﻿using CadastroNumeros.Contato.Consumer.Consumers;
 using CadastroNumeros.Domain.Configuration.IOptions;
+using CadastroNumeros.Implementations;
 using CadastroNumeros.Infra.Data;
+using CadastroNumeros.Infra.Interfaces.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,8 @@ var connectionString = configuration.GetValue<string>("ConnectionStrings:Default
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
 builder.Services.Configure<RabbitMQSetting>(builder.Configuration.GetSection("RabbitMQ"));
+
+builder.Services.AddScoped<IContatoRepository, ContatoRepository>();
 
 builder.Services.AddHostedService<ContatoMessageConsumerService>();
 

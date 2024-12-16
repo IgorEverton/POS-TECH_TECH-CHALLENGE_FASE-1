@@ -1,8 +1,12 @@
-﻿using CadastroNumeros.Domain.Configuration.IOptions;
+﻿using CadastroNumeros.Domain.Configuration.CustomMessages;
+using CadastroNumeros.Domain.Configuration.IOptions;
 using CadastroNumeros.Domain.Configuration.Queues.RabbitMQ;
+using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Infra.Interfaces.Repository;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -16,10 +20,14 @@ namespace CadastroNumeros.Contato.Consumer.Consumers
         private IConnection _connection;
         private IChannel _channel;
         private readonly ConnectionFactory _factory;
-        public ContatoMessageConsumerService(IOptions<RabbitMQSetting> rabbitMqSetting, IServiceProvider serviceProvider, ILogger<ContatoMessageConsumerService> logger)
+        private readonly IContatoRepository _contatoRepository;
+        public ContatoMessageConsumerService(IOptions<RabbitMQSetting> rabbitMqSetting,
+                                             IContatoRepository contatoRepository, 
+                                             ILogger<ContatoMessageConsumerService> logger)
         {
             _rabbitMqSetting = rabbitMqSetting.Value;
             _logger = logger;
+            _contatoRepository = contatoRepository;
 
             _factory = new ConnectionFactory
             {
@@ -31,12 +39,8 @@ namespace CadastroNumeros.Contato.Consumer.Consumers
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Console.WriteLine("Iniciando conexão com a fila");
-
             _connection = await _factory.CreateConnectionAsync();
             _channel = await _connection.CreateChannelAsync();
-
-            Console.WriteLine("Fila conectada iniciando consumo!");
 
             await StartConsuming(RabbitMQQueues.CadastroContatoQueue, stoppingToken);
             await Task.CompletedTask;
@@ -44,6 +48,8 @@ namespace CadastroNumeros.Contato.Consumer.Consumers
 
         private async Task StartConsuming(string queueName, CancellationToken cancellationToken)
         {
+            _logger.LogInformation(QueueProcessingMessages.ConsumoIniciado);
+
             await _channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
             var consumer = new AsyncEventingBasicConsumer(_channel);
@@ -60,7 +66,7 @@ namespace CadastroNumeros.Contato.Consumer.Consumers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Exception occurred while processing message from queue {queueName}: {ex}");
+                    _logger.LogError($"{QueueProcessingMessages.ErroProcessarQueue} {queueName}: {ex}");
                 }
 
                 if (processedSuccessfully)
@@ -78,9 +84,36 @@ namespace CadastroNumeros.Contato.Consumer.Consumers
 
         private async Task<bool> ProcessMessageAsync(string message)
         {
-            Console.WriteLine(message);
+            try
+            {
+                var solicitacao = JsonConvert.DeserializeObject<CadastroSolicitacao>(message);
 
-            return true;
+                switch (solicitacao.TipoSolicitacao)
+                {
+                    case Domain.Enum.TipoSolicitacao.Inserir:
+                        await _contatoRepository.CriarContato(solicitacao.Contato);
+                        break;
+                    case Domain.Enum.TipoSolicitacao.Alterar:
+                        await _contatoRepository.AtualizarContato(solicitacao.Contato);
+                        break;
+                    case Domain.Enum.TipoSolicitacao.Deletar:
+                        await _contatoRepository.DeletarContato(solicitacao.Contato.Id);
+                        break;
+                    default:
+                        _logger.LogWarning(QueueProcessingMessages.AcaoInvalida);
+                        return false;
+                }
+
+                _logger.LogInformation(QueueProcessingMessages.OperacaoRealizadaSucesso);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return false;
+            }
+
         }
 
         public override void Dispose()
