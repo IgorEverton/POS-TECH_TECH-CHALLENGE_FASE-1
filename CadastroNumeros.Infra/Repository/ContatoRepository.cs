@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CadastroNumeros.Implementations;
 
-public class ContatoRepository : IContatoRepository
+public class ContatoRepository : IContatoRepository, IDisposable
 {
     private readonly AppDbContext _context;
     public ContatoRepository(AppDbContext context)
@@ -67,10 +67,12 @@ public class ContatoRepository : IContatoRepository
     /// Método responsável por atualizar as informações de um contato no banco de dados
     /// </summary>
     /// <param name="contato">Um objeto do tipo Contato</param>
-    public async Task<int> AtualizarContato(Contato contato)
+    public async Task AtualizarContato(Contato contato)
     {
         _context.Contatos.Update(contato);
-        return _context.SaveChanges();
+        _context.SaveChanges();
+
+        Dispose();
     }
 
     /// <summary>
@@ -89,5 +91,10 @@ public class ContatoRepository : IContatoRepository
         {
             throw new Exception("Contato não encontrado na base de dados");
         }
+    }
+
+    public void Dispose()
+    {
+        _context.ChangeTracker.Clear();
     }
 }

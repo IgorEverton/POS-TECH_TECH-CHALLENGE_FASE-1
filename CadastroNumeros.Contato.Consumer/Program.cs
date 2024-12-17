@@ -17,11 +17,11 @@ var configuration = new ConfigurationBuilder()
         .Build();
 
 var connectionString = configuration.GetValue<string>("ConnectionStrings:DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Transient);
 
 builder.Services.Configure<RabbitMQSetting>(builder.Configuration.GetSection("RabbitMQ"));
 
-builder.Services.AddScoped<IContatoRepository, ContatoRepository>();
+builder.Services.AddTransient<IContatoRepository, ContatoRepository>();
 
 builder.Services.AddHostedService<ContatoMessageConsumerService>();
 
