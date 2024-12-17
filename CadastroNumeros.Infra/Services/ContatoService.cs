@@ -1,30 +1,92 @@
 ﻿using CadastroNumeros.Infra.Interfaces.Repository;
 using CadastroNumeros.Infra.Interfaces.Service;
 using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Infra.Interfaces.Queues;
+using CadastroNumeros.Domain.Configuration.Queues.RabbitMQ;
+using CadastroNumeros.Domain.Configuration.CustomMessages;
+using Polly.CircuitBreaker;
+using CadastroNumeros.Infra.Polices;
+using CadastroNumeros.Infra.Interfaces.Polices;
 
 namespace CadastroNumeros.Infra.Services;
 
-public class ContatoService : IContatoService
+public class ContatoService : ServiceBase, IContatoService
 {
     private readonly IContatoRepository _contatoRepository;
+    private readonly IRabbitMQPublisher<CadastroSolicitacao> _contatoPublisher;
+    private readonly AsyncCircuitBreakerPolicy _circuitBreakerPolicy;
 
-    public ContatoService(IContatoRepository contatoRepository)
+    public ContatoService(IContatoRepository contatoRepository, 
+                          IRabbitMQPublisher<CadastroSolicitacao> publisher,
+                          ICircuitBreakerPolicyProvider policyProvider)
     {
         _contatoRepository = contatoRepository;
+        _contatoPublisher = publisher;
+        _circuitBreakerPolicy = policyProvider.GetPolicy();
     }
-    public async Task<int> AtualizarContato(Contato contato)
+    public async Task<SolicitacaoResult> AtualizarContato(Contato contato)
     {
-        return await _contatoRepository.AtualizarContato(contato);
+        try
+        {
+            var solicitacao = new CadastroSolicitacao() { Contato = contato, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Alterar };
+
+            await _circuitBreakerPolicy.ExecuteAsync(() =>
+                    _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue));
+
+            return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
+        }
+        catch (BrokenCircuitException)
+        {
+            return RetornaResultado(ReturnMessages.ServicoIndisponivel, false);
+        }
+        catch (Exception ex)
+        {
+            return RetornaResultado($"{ReturnMessages.SolicitacaoNaoRealizada}{ex.Message}", false);
+        }
     }
 
-    public async Task<Contato> CriarContato(Contato contato)
+    public async Task<SolicitacaoResult> CriarContato(Contato contato)
     {
-        return await _contatoRepository.CriarContato(contato);
+        try
+        {
+            var solicitacao = new CadastroSolicitacao() { Contato = contato, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Inserir };
+
+            // Execute a chamada à fila RabbitMQ com o Circuit Breaker
+            await _circuitBreakerPolicy.ExecuteAsync(() =>
+                    _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue));
+
+            return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
+        }
+        catch (BrokenCircuitException)
+        {
+            return RetornaResultado(ReturnMessages.ServicoIndisponivel, false);
+        }
+        catch (Exception ex)
+        {
+            return RetornaResultado($"{ReturnMessages.SolicitacaoNaoRealizada}{ex.Message}", false);
+        }
     }
 
-    public async Task DeletarContato(Guid id)
+
+    public async Task<SolicitacaoResult> DeletarContato(Guid id)
     {
-        await _contatoRepository.DeletarContato(id);
+        try
+        {
+            var solicitacao = new CadastroSolicitacao() { Contato = new() { Id = id}, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Alterar };
+
+            await _circuitBreakerPolicy.ExecuteAsync(() =>
+                    _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue));
+
+            return RetornaResultado(ReturnMessages.SolicitacaoRealizada);
+        }
+        catch (BrokenCircuitException)
+        {
+            return RetornaResultado(ReturnMessages.ServicoIndisponivel, false);
+        }
+        catch (Exception ex)
+        {
+            return RetornaResultado($"{ReturnMessages.SolicitacaoNaoRealizada}{ex.Message}", false);
+        }
     }
 
     public async Task<IEnumerable<Contato>> ListarContatos(int pageNumber = 1, int pageSize = 10)

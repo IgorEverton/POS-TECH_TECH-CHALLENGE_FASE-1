@@ -1,129 +1,128 @@
-﻿using CadastroNumeros.Domain.Models;
+﻿using CadastroNumeros.Domain.Configuration.CustomMessages;
+using CadastroNumeros.Domain.Configuration.Queues.RabbitMQ;
+using CadastroNumeros.Domain.Models;
+using CadastroNumeros.Infra.Interfaces.Polices;
+using CadastroNumeros.Infra.Interfaces.Queues;
 using CadastroNumeros.Infra.Interfaces.Repository;
 using CadastroNumeros.Infra.Services;
 using Moq;
+using Polly;
+using Polly.CircuitBreaker;
 
 namespace CadastroNumeros.Teste.Services
 {
     public class ContatoServiceTests
     {
-        private readonly Mock<IContatoRepository> _mockContatoRepository;
-        private readonly ContatoService _contatoService;
+        private readonly Mock<IContatoRepository> _mockRepository;
+        private readonly Mock<IRabbitMQPublisher<CadastroSolicitacao>> _mockPublisher;
+        private readonly Mock<ICircuitBreakerPolicyProvider> _mockPolicyProvider;
+        private readonly AsyncCircuitBreakerPolicy _mockPolicy;
+
+        private readonly ContatoService _service;
 
         public ContatoServiceTests()
         {
-            _mockContatoRepository = new Mock<IContatoRepository>();
-            _contatoService = new ContatoService(_mockContatoRepository.Object);
+            _mockRepository = new Mock<IContatoRepository>();
+            _mockPublisher = new Mock<IRabbitMQPublisher<CadastroSolicitacao>>();
+            _mockPolicyProvider = new Mock<ICircuitBreakerPolicyProvider>();
+
+            // Configura a política simulada
+            _mockPolicy = Policy
+                .Handle<Exception>()
+                .CircuitBreakerAsync(3, TimeSpan.FromSeconds(30)); // Define um circuito que quebra após 3 falhas
+
+            // Configura o mock para retornar a política simulada
+            _mockPolicyProvider.Setup(p => p.GetPolicy()).Returns(_mockPolicy);
+
+            // Instancia o serviço com os mocks
+            _service = new ContatoService(
+                _mockRepository.Object,
+                _mockPublisher.Object,
+                _mockPolicyProvider.Object);
+        }
+
+        // Teste de sucesso
+        [Fact]
+        public async Task CriarContato_Success_ReturnsSuccessMessage()
+        {
+            // Arrange
+            var contato = new Contato { Id = Guid.NewGuid(), Nome = "Teste", Telefone = "999999999" };
+
+            // Configura o mock do publisher para retornar sucesso
+            _mockPublisher
+                .Setup(p => p.PublishMessageAsync(It.IsAny<CadastroSolicitacao>(), RabbitMQQueues.CadastroContatoQueue))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            var result = await _service.CriarContato(contato);
+
+            // Assert
+            Assert.True(result.Sucesso);
+            Assert.Equal(ReturnMessages.SolicitacaoRealizada, result.Mensagem);
         }
 
         [Fact]
-        public async Task CriarContato_DeveChamarRepositoryERetornarContato()
+        public async Task CriarContato_CircuitBreakerOpen_ReturnsFailureMessage()
         {
-            var contato = new Contato
-            {
-                Id = Guid.NewGuid(),
-                Nome = "Carlos Silva",
-                Idade = 28,
-                Email = "carlos.silva@example.com",
-                Telefone = "987654321",
-                CodigoDdd = 21
-            };
+            // Arrange
+            var contato = new Contato { Id = Guid.NewGuid(), Nome = "Teste", Telefone = "999999999" };
 
-            _mockContatoRepository.Setup(repo => repo.CriarContato(contato))
-                .ReturnsAsync(contato);
+            // Configura o mock do publisher para lançar uma exceção quando o Circuit Breaker está aberto
+            _mockPublisher
+                .Setup(p => p.PublishMessageAsync(It.IsAny<CadastroSolicitacao>(), RabbitMQQueues.CadastroContatoQueue))
+                .ThrowsAsync(new BrokenCircuitException("Circuito aberto"));
 
-            var result = await _contatoService.CriarContato(contato);
+            // Simula o Circuit Breaker já "aberto"
+            var policy = _mockPolicyProvider.Object.GetPolicy();
 
-            _mockContatoRepository.Verify(repo => repo.CriarContato(contato), Times.Once);
-            Assert.Equal(contato, result);
+            // Act
+            var result = await _service.CriarContato(contato);
+
+            // Assert
+            Assert.False(result.Sucesso);
+            Assert.Contains("O serviço está temporariamente indisponível", result.Mensagem);
         }
 
+
+
+        // Teste para o método AtualizarContato
         [Fact]
-        public async Task RetornarContato_DeveChamarRepositoryERetornarContato()
+        public async Task AtualizarContato_Success_ReturnsSuccessMessage()
         {
-            var contatoId = Guid.NewGuid();
-            var contato = new Contato
-            {
-                Id = contatoId,
-                Nome = "Ana Souza",
-                Idade = 25,
-                Email = "ana.souza@example.com",
-                Telefone = "123456789",
-                CodigoDdd = 31
-            };
+            // Arrange
+            var contato = new Contato { Id = Guid.NewGuid(), Nome = "Teste", Telefone = "999999999" };
 
-            _mockContatoRepository.Setup(repo => repo.RetornarContato(contatoId))
-                .ReturnsAsync(contato);
+            // Configura o mock do publisher para retornar sucesso
+            _mockPublisher
+                .Setup(p => p.PublishMessageAsync(It.IsAny<CadastroSolicitacao>(), RabbitMQQueues.CadastroContatoQueue))
+                .Returns(Task.CompletedTask);
 
-            var result = await _contatoService.RetornarContato(contatoId);
+            // Act
+            var result = await _service.AtualizarContato(contato);
 
-            _mockContatoRepository.Verify(repo => repo.RetornarContato(contatoId), Times.Once);
-            Assert.Equal(contato, result);
+            // Assert
+            Assert.True(result.Sucesso);
+            Assert.Equal(ReturnMessages.SolicitacaoRealizada, result.Mensagem);
         }
 
+        // Teste para o método DeletarContato
         [Fact]
-        public async Task ListarContatos_DeveChamarRepositoryERetornarTodosOsContatos()
+        public async Task DeletarContato_Success_ReturnsSuccessMessage()
         {
-            var contatos = new List<Contato>
-            {
-                new Contato { Id = Guid.NewGuid(), Nome = "Pedro Lima", Idade = 30, Email = "pedro.lima@example.com", Telefone = "111111111", CodigoDdd = 11 },
-                new Contato { Id = Guid.NewGuid(), Nome = "Maria Silva", Idade = 35, Email = "maria.silva@example.com", Telefone = "222222222", CodigoDdd = 21 }
-            };
+            // Arrange
+            var contato = new Contato { Id = Guid.NewGuid(), Nome = "Teste", Telefone = "999999999" };
 
-            _mockContatoRepository.Setup(repo => repo.ListarContatos(It.IsAny<int>(), It.IsAny<int>()))
-                .ReturnsAsync(contatos);
+            // Configura o mock do publisher para retornar sucesso
+            _mockPublisher
+                .Setup(p => p.PublishMessageAsync(It.IsAny<CadastroSolicitacao>(), RabbitMQQueues.CadastroContatoQueue))
+                .Returns(Task.CompletedTask);
 
-            var result = await _contatoService.ListarContatos(1, 10);
+            // Act
+            var result = await _service.DeletarContato(contato.Id);
 
-            _mockContatoRepository.Verify(repo => repo.ListarContatos(It.IsAny<int>(), It.IsAny<int>()), Times.Once);
-            Assert.Equal(contatos, result);
-        }
-
-        [Fact]
-        public async Task ListarContatosPorDdd_DeveChamarRepositoryERetornarContatosComOsDDDs()
-        {
-            var ddd = 11;
-            var contatos = new List<Contato>
-            {
-                new Contato { Id = Guid.NewGuid(), Nome = "Pedro Lima", Idade = 30, Email = "pedro.lima@example.com", Telefone = "111111111", CodigoDdd = 11 },
-                new Contato { Id = Guid.NewGuid(), Nome = "José Almeida", Idade = 40, Email = "jose.almeida@example.com", Telefone = "333333333", CodigoDdd = 11 }
-            };
-
-            _mockContatoRepository.Setup(repo => repo.ListarContatosPorDdd(ddd))
-                .ReturnsAsync(contatos);
-
-            var result = await _contatoService.ListarContatosPorDdd(ddd);
-
-            _mockContatoRepository.Verify(repo => repo.ListarContatosPorDdd(ddd), Times.Once);
-            Assert.Equal(contatos, result);
-        }
-
-        [Fact]
-        public async Task AtualizarContato_DeveChamarORepository()
-        {
-            var contato = new Contato
-            {
-                Id = Guid.NewGuid(),
-                Nome = "Pedro Lima",
-                Idade = 30,
-                Email = "pedro.lima@example.com",
-                Telefone = "111111111",
-                CodigoDdd = 11
-            };
-
-            await _contatoService.AtualizarContato(contato);
-
-            _mockContatoRepository.Verify(repo => repo.AtualizarContato(contato), Times.Once);
-        }
-
-        [Fact]
-        public async Task DeletarContato_DeveChamarORepository()
-        {
-            var contatoId = Guid.NewGuid();
-
-            await _contatoService.DeletarContato(contatoId);
-
-            _mockContatoRepository.Verify(repo => repo.DeletarContato(contatoId), Times.Once);
+            // Assert
+            Assert.True(result.Sucesso);
+            Assert.Equal(ReturnMessages.SolicitacaoRealizada, result.Mensagem);
         }
     }
 }

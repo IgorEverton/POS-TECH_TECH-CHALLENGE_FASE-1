@@ -55,7 +55,8 @@ public class ContatoController : ControllerBase
         {
             contato.Id = Guid.NewGuid(); // Gerar um novo GUID para o contato
             var contatoCriado = await _service.CriarContato(contato);
-            return CreatedAtAction(nameof(GetById), new { id = contatoCriado.Id }, contatoCriado); // Retornar CreatedAtAction com o ID correto
+
+            return Ok(contatoCriado);
         }
         catch (Exception ex)
         {
@@ -72,28 +73,30 @@ public class ContatoController : ControllerBase
         }
         try
         {
-            int linhasAtualizadas = await _service.AtualizarContato(contatoAtualizado);
-            return (linhasAtualizadas > 0) ?
-                Ok(contatoAtualizado)
-                : BadRequest("Contato não encontrado");
+            var solicitacaoResult = await _service.AtualizarContato(contatoAtualizado);
+
+            return Ok(solicitacaoResult);
         }
         catch (Exception ex)
         {
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+
     [HttpDelete("delete-contato/{id}")]
     public async Task<IActionResult> DeleteCadastro(Guid id)
     {
         try
         {
             var contatoEncontrado = await _service.RetornarContato(id);
+
             if (contatoEncontrado == null)
             {
                 return NotFound("Contato não encontrado");
             }
-            await _service.DeletarContato(id);
-            return NoContent();
+            var solicitacaoResult = await _service.DeletarContato(id);
+
+            return Ok(solicitacaoResult);
         }
         catch (Exception ex)
         {

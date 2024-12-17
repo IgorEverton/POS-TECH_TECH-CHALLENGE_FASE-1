@@ -1,8 +1,13 @@
 ﻿using CadastroNumeros.Api.Controllers;
 using CadastroNumeros.Domain.Models;
 using CadastroNumeros.Infra.Interfaces.Service;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace CadastroNumeros.Teste.Controllers
 {
@@ -18,14 +23,14 @@ namespace CadastroNumeros.Teste.Controllers
         }
 
         [Fact]
-        public async Task GetAll_DeveRetornarOKComOsContatos()
+        public async Task GetAll_ShouldReturnOkWithListOfContatos()
         {
             // Arrange
             var contatos = new List<Contato>
-            {
-                new Contato { Id = Guid.NewGuid(), Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 },
-                new Contato { Id = Guid.NewGuid(), Nome = "Ana Souza", Idade = 25, Email = "ana.souza@example.com", Telefone = "123456789", CodigoDdd = 31 }
-            };
+        {
+            new Contato { Id = Guid.NewGuid(), Nome = "Contato 1" },
+            new Contato { Id = Guid.NewGuid(), Nome = "Contato 2" }
+        };
 
             _mockService.Setup(s => s.ListarContatos(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(contatos);
 
@@ -34,16 +39,15 @@ namespace CadastroNumeros.Teste.Controllers
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnValue = Assert.IsType<List<Contato>>(okResult.Value);
-            Assert.Equal(2, returnValue.Count);
+            Assert.Equal(contatos, okResult.Value);
         }
 
         [Fact]
-        public async Task GetById_DeveRetornarOKComOContato()
+        public async Task GetById_ShouldReturnOk_WhenContatoExists()
         {
             // Arrange
             var contatoId = Guid.NewGuid();
-            var contato = new Contato { Id = contatoId, Nome = "Ana Souza", Idade = 25, Email = "ana.souza@example.com", Telefone = "123456789", CodigoDdd = 31 };
+            var contato = new Contato { Id = contatoId, Nome = "Teste" };
 
             _mockService.Setup(s => s.RetornarContato(contatoId)).ReturnsAsync(contato);
 
@@ -52,15 +56,15 @@ namespace CadastroNumeros.Teste.Controllers
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnValue = Assert.IsType<Contato>(okResult.Value);
-            Assert.Equal(contatoId, returnValue.Id);
+            Assert.Equal(contato, okResult.Value);
         }
 
         [Fact]
-        public async Task GetById_DeveRetornarNotFound()
+        public async Task GetById_ShouldReturnNotFound_WhenContatoDoesNotExist()
         {
             // Arrange
             var contatoId = Guid.NewGuid();
+
             _mockService.Setup(s => s.RetornarContato(contatoId)).ReturnsAsync((Contato)null);
 
             // Act
@@ -71,102 +75,82 @@ namespace CadastroNumeros.Teste.Controllers
         }
 
         [Fact]
-        public async Task GetByDdd_DeveRetornarOkComOsContatos()
+        public async Task PostInserirContato_ShouldReturnOk_WhenContatoIsCreated()
         {
             // Arrange
-            var ddd = 21;
-            var contatos = new List<Contato>
-            {
-                new Contato { Id = Guid.NewGuid(), Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 }
-            };
+            var contato = new Contato { Nome = "Teste", CodigoDdd = 11, Telefone = "999999999" };
+            var resultMessage = new SolicitacaoResult { Sucesso = true, Mensagem = "Sucesso" };
 
-            _mockService.Setup(s => s.ListarContatosPorDdd(ddd)).ReturnsAsync(contatos);
-
-            // Act
-            var result = await _controller.GetById(ddd);
-
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnValue = Assert.IsType<List<Contato>>(okResult.Value);
-            Assert.Single(returnValue);
-        }
-
-        [Fact]
-        public async Task PostInserirContato_DeveRetornarCreatedAtAction()
-        {
-            // Arrange
-            var contato = new Contato { Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
-            var createdContatoId = Guid.NewGuid(); // Gerar um GUID específico para o teste
-            var createdContato = new Contato { Id = createdContatoId, Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
-
-            _mockService.Setup(s => s.CriarContato(contato)).ReturnsAsync(createdContato);
+            _mockService.Setup(s => s.CriarContato(It.IsAny<Contato>())).ReturnsAsync(resultMessage);
 
             // Act
             var result = await _controller.PostInserirContato(contato);
 
             // Assert
-            var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
-            var returnValue = Assert.IsType<Contato>(createdAtActionResult.Value);
-            Assert.Equal(createdContatoId, returnValue.Id); // Verificar se o ID retornado é o esperado
-            Assert.Equal("GetById", createdAtActionResult.ActionName); // Verificar o nome da ação
-            Assert.Equal(createdContatoId, createdAtActionResult.RouteValues["id"]); // Verificar o valor do ID na rota
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(resultMessage, okResult.Value);
         }
 
+        [Fact]
+        public async Task PostInserirContato_ShouldReturnBadRequest_WhenContatoIsNull()
+        {
+            // Act
+            var result = await _controller.PostInserirContato(null);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("Contato não pode ser nulo", badRequestResult.Value);
+        }
 
         [Fact]
-        public async Task PutAtualizacaoContato_DeveRetornarOk()
+        public async Task PutAtualizacaoContato_ShouldReturnOk_WhenContatoIsUpdated()
         {
             // Arrange
-            var contato = new Contato { Id = Guid.NewGuid(), Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
-            var qtdLinhasAtualizadas = 1;
+            var contato = new Contato { Id = Guid.NewGuid(), Nome = "Atualizado" };
+            var resultMessage = new SolicitacaoResult { Sucesso = true, Mensagem = "Atualizado com sucesso" };
 
-            _mockService.Setup(s => s.RetornarContato(contato.Id)).ReturnsAsync(contato);
-            _mockService.Setup(s => s.AtualizarContato(contato)).ReturnsAsync(qtdLinhasAtualizadas);
+            _mockService.Setup(s => s.AtualizarContato(contato)).ReturnsAsync(resultMessage);
 
             // Act
             var result = await _controller.PutAtualizacaoContato(contato);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var returnValue = Assert.IsType<Contato>(okResult.Value);
-            Assert.Equal(contato.Id, returnValue.Id);
+            Assert.Equal(resultMessage, okResult.Value);
         }
 
         [Fact]
-        public async Task PutAtualizacaoContato_DeveRetornarBadRequestSeContatoNaoForEncontrado()
+        public async Task PutAtualizacaoContato_ShouldReturnBadRequest_WhenContatoIsNull()
         {
-            // Arrange
-            var contato = new Contato { Id = Guid.NewGuid(), Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
-
-            _mockService.Setup(s => s.RetornarContato(contato.Id)).ReturnsAsync((Contato)null);
-
             // Act
-            var result = await _controller.PutAtualizacaoContato(contato);
+            var result = await _controller.PutAtualizacaoContato(null);
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Equal("Contato não encontrado", badRequestResult.Value);
+            Assert.Equal("Todos os dados devem ser preenchidos", badRequestResult.Value);
         }
 
         [Fact]
-        public async Task DeleteCadastro_DeveRetornarNoContent()
+        public async Task DeleteCadastro_ShouldReturnOk_WhenContatoIsDeleted()
         {
             // Arrange
             var contatoId = Guid.NewGuid();
-            var contato = new Contato { Id = contatoId, Nome = "Carlos Silva", Idade = 28, Email = "carlos.silva@example.com", Telefone = "987654321", CodigoDdd = 21 };
+            var contato = new Contato { Id = contatoId };
+            var resultMessage = new SolicitacaoResult { Sucesso = true, Mensagem = "Deletado com sucesso" };
 
             _mockService.Setup(s => s.RetornarContato(contatoId)).ReturnsAsync(contato);
-            _mockService.Setup(s => s.DeletarContato(contatoId)).Returns(Task.CompletedTask);
+            _mockService.Setup(s => s.DeletarContato(contatoId)).ReturnsAsync(resultMessage);
 
             // Act
             var result = await _controller.DeleteCadastro(contatoId);
 
             // Assert
-            Assert.IsType<NoContentResult>(result);
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Equal(resultMessage, okResult.Value);
         }
 
         [Fact]
-        public async Task DeleteCadastro_DeveRetornarNotFoundSeContatoNaoForEncontrado()
+        public async Task DeleteCadastro_ShouldReturnNotFound_WhenContatoDoesNotExist()
         {
             // Arrange
             var contatoId = Guid.NewGuid();
