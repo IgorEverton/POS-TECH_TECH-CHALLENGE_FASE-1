@@ -118,8 +118,12 @@ namespace CadastroNumeros.Contato.Consumer.Consumers
 
         public override void Dispose()
         {
-            _channel.CloseAsync();
-            _connection.CloseAsync();
+            if(_channel is not null)
+                _channel.CloseAsync();
+
+            if(_connection is not null)
+                _connection.CloseAsync();
+
             base.Dispose();
         }
     }
