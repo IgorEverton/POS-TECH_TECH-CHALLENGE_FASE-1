@@ -72,7 +72,7 @@ public class ContatoService : ServiceBase, IContatoService
     {
         try
         {
-            var solicitacao = new CadastroSolicitacao() { Contato = new() { Id = id}, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Alterar };
+            var solicitacao = new CadastroSolicitacao() { Contato = new() { Id = id}, TipoSolicitacao = Domain.Enum.TipoSolicitacao.Deletar };
 
             await _circuitBreakerPolicy.ExecuteAsync(() =>
                     _contatoPublisher.PublishMessageAsync(solicitacao, RabbitMQQueues.CadastroContatoQueue));

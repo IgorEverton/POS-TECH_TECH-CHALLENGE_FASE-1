@@ -82,10 +82,13 @@ public class ContatoRepository : IContatoRepository, IDisposable
     public async Task DeletarContato(Guid id)
     {
         var contatoEncontrado = await _context.Contatos.FindAsync(id);
+
         if (contatoEncontrado != null)
         {
             _context.Remove(contatoEncontrado);
             _context.SaveChanges();
+
+            Dispose();
         }
         else
         {
