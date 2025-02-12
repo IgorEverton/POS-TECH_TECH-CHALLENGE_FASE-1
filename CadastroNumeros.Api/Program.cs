@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var configuration = new ConfigurationBuilder()
         .AddJsonFile("appsettings.json")
+        .AddEnvironmentVariables()
         .Build();
 
 builder.Services.AddControllers();

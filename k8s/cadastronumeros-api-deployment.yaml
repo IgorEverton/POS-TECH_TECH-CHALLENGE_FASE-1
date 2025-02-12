@@ -2,7 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose.exe convert -f docker-compose.yml -o k8s/
+    kompose.cmd: kompose.exe convert -f docker-compose.yml -o .
+    kompose.image-pull-policy: Never
     kompose.version: 1.35.0 (9532ceef3)
   labels:
     io.kompose.service: cadastronumeros-api
@@ -15,7 +16,8 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose.exe convert -f docker-compose.yml -o k8s/
+        kompose.cmd: kompose.exe convert -f docker-compose.yml -o .
+        kompose.image-pull-policy: Never
         kompose.version: 1.35.0 (9532ceef3)
       labels:
         io.kompose.service: cadastronumeros-api
@@ -26,6 +28,15 @@ spec:
               value: Development
             - name: ASPNETCORE_HTTP_PORTS
               value: "8080"
-          image: cadastronumeros-api:local
+            - name: RabbitMQ__HostName
+              value: rabbitmq-service.default.svc.cluster.local
+            - name: RabbitMQ__Password
+              value: guest
+            - name: RabbitMQ__UserName
+              value: guest
+            - name: ConnectionStrings__DefaultConnection
+              value: "Server=sql-server-service.default.svc.cluster.local;Database=CadastroNumerosDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;Connection Timeout=30;"
+          image: cadastronumeros-api:latest
+          imagePullPolicy: Never
           name: cadastronumeros-api
       restartPolicy: Always

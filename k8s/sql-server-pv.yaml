@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sql-server-pv
+spec:
+  capacity:
+    storage: 5Gi  # Ajuste o tamanho conforme necessário
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data/sql-server"  # Caminho no nó para armazenar os dados do SQL Server

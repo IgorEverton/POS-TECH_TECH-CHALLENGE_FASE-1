@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sql-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sql-server
+  template:
+    metadata:
+      labels:
+        app: sql-server
+    spec:
+      containers:
+        - name: sql-server
+          image: mcr.microsoft.com/mssql/server:2022-latest  # Imagem do SQL Server
+          env:
+            - name: SA_PASSWORD
+              value: "YourStrong!Passw0rd"  # Defina uma senha forte para o SA
+            - name: ACCEPT_EULA
+              value: "Y"  # Aceita o EULA do SQL Server
+          ports:
+            - containerPort: 1433  # Porta padrão do SQL Server
+          volumeMounts:
+            - name: sql-server-storage
+              mountPath: /var/opt/mssql  # Diretório onde os dados serão armazenados
+      volumes:
+        - name: sql-server-storage
+          persistentVolumeClaim:
+            claimName: sql-server-pvc  # Referência ao PVC
