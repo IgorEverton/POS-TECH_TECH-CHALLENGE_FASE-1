@@ -9,7 +9,7 @@ metadata:
     io.kompose.service: cadastronumeros-consumer
   name: cadastronumeros-consumer
 spec:
-  replicas: 1
+  replicas: 5
   selector:
     matchLabels:
       io.kompose.service: cadastronumeros-consumer

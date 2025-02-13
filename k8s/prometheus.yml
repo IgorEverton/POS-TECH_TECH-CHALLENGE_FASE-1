@@ -4,4 +4,4 @@ global:
 scrape_configs:
   - job_name: 'cadastronumeros-api-read-prometheus'
     static_configs:
-    - targets: ['cadastronumeros-api:8080', 'node-exporter:9100']
+    - targets: ['cadastronumeros-api.default.svc.cluster.local', 'node-exporter.default.svc.cluster.local', cadastronumeros-consumer.default.svc.cluster.local]
